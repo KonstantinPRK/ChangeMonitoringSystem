@@ -1,4 +1,4 @@
-package dev.prk.changedetectionbot.bot.service;
+package application.service;
 
 public final class ConversationStateService {
 }
