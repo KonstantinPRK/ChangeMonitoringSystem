@@ -1,4 +1,5 @@
-package prk.dev.bot.client;
+package client;
 
 public interface ScrapperClient {
+
 }

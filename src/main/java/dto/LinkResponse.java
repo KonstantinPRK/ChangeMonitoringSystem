@@ -1,4 +1,4 @@
-package prk.dev.bot.dto;
+package dto;
 
 public final class LinkResponse {
 }

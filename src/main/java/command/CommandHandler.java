@@ -1,4 +1,4 @@
-package prk.dev.bot.command;
+package command;
 
 public interface CommandHandler {
 }

@@ -1,4 +1,4 @@
-package prk.dev.bot.service;
+package service;
 
 public interface BotService {
 }

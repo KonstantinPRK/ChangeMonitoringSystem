@@ -1,4 +1,4 @@
-package prk.dev.bot.controller;
+package controller;
 
 public final class UpdateController {
 }
