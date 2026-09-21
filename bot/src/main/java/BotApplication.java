@@ -1,3 +1,5 @@
 public final class BotApplication {
-    //d
+    public static void main(String[] args) {
+
+    }
 }
