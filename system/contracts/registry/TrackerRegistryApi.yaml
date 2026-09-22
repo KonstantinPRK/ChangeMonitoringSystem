@@ -1,0 +1,38 @@
+openapi: 3.1.0
+info:
+  title: application.ChangeMonitoringSystem Tracker Registry API
+  version: 1.0.0
+paths:
+  /internal/trackers/register:
+    post:
+      summary: Register a tracker and its supportedHosts
+      responses:
+        "204":
+          description: Registered
+        "409":
+          description: Conflicting supported host or instance
+  /internal/trackers/{instanceId}/heartbeat:
+    post:
+      summary: Renew a tracker instance lease
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Lease renewed
+  /internal/trackers/{instanceId}:
+    delete:
+      summary: Deregister a tracker instance
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deregistered
+

@@ -17,7 +17,11 @@ target/
 # Local configuration and secrets
 .env
 .env.*
-!.env.example
+**/.env
+**/.env.*
+
+# Accidental Maven metadata outside target
+pom.properties
 
 # Logs and runtime data
 *.log

@@ -1,0 +1,12 @@
+openapi: 3.1.0
+info:
+  title: Bot API
+  version: 1.0.0
+paths:
+  /notifications:
+    post:
+      summary: Deliver a notification to a bot-local user
+      responses:
+        "204":
+          description: Accepted
+

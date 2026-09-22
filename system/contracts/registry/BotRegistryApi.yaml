@@ -1,0 +1,38 @@
+openapi: 3.1.0
+info:
+  title: application.ChangeMonitoringSystem Bot Registry API
+  version: 1.0.0
+paths:
+  /internal/bots/register:
+    post:
+      summary: Register a bot instance
+      responses:
+        "204":
+          description: Registered
+        "409":
+          description: Conflicting instance
+  /internal/bots/{instanceId}/heartbeat:
+    post:
+      summary: Renew a bot instance lease
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Lease renewed
+  /internal/bots/{instanceId}:
+    delete:
+      summary: Deregister a bot instance
+      parameters:
+        - name: instanceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deregistered
+
