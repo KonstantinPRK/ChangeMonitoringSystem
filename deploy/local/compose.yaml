@@ -1,0 +1,46 @@
+name: change-detection-bot
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${TRACKER_DB_NAME}
+      POSTGRES_USER: ${TRACKER_DB_USER}
+      POSTGRES_PASSWORD: ${TRACKER_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:${TRACKER_DB_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U ${TRACKER_DB_USER} -d ${TRACKER_DB_NAME}
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  redis:
+    image: redis:8.10.1-alpine
+    environment:
+      REDIS_PASSWORD: ${BOT_REDIS_PASSWORD}
+    command:
+      - /bin/sh
+      - -c
+      - exec redis-server --appendonly yes --appendfsync everysec --requirepass "$$REDIS_PASSWORD"
+    ports:
+      - "127.0.0.1:${BOT_REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping | grep PONG
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  postgres-data:
+  redis-data:

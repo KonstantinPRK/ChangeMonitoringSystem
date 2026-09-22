@@ -11,7 +11,7 @@ import application.command.handler.TrackCommandHandler;
 import application.command.handler.UntrackCommandHandler;
 import application.messenger.MessengerIntegration;
 import application.messenger.MessengerAdapter;
-import application.messenger.MessengerType;
+import infrastructure.MessengerType;
 import application.service.ConversationStateService;
 import java.util.Collection;
 import java.util.List;
