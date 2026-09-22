@@ -1,9 +1,11 @@
-# ChangeDetectionBot
+# application.ChangeMonitoringSystem
 
-Multi-module Maven project containing two independently deployable applications:
+application.ChangeMonitoringSystem is a Maven multi-module system made of five independently deployable Java services:
 
-- `bot` receives messenger updates and communicates with users;
-- `tracker` stores subscriptions and checks tracked resources for changes.
+- ChangeMonitoringSystem — runtime service registry and request router;
+- ChangeDetectionBot — Telegram communication service;
+- UpdateTrackingSystemBot — VK communication service;
+- GitHubTracker — GitHub API monitoring service;
+- StackOverflowTracker — StackOverflow API monitoring service.
 
-Operational configuration is grouped under `deploy`. Database migrations belong
-to `tracker`, because that application owns the relational database schema.
+Services communicate over network contracts. No runtime service depends on another service's Java classes.

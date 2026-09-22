@@ -11,10 +11,10 @@
 
   <artifactId>ChangeMonitoringSystem</artifactId>
   <packaging>jar</packaging>
-  <name>application.ChangeMonitoringSystem</name>
+  <name>ChangeMonitoringSystem</name>
 
   <properties>
-    <main.class>ChangeMonitoringSystemApplication</main.class>
+    <main.class>bootstrap.App</main.class>
   </properties>
 
   <dependencies>

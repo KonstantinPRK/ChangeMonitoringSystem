@@ -1,7 +1,6 @@
 asyncapi: 3.0.0
 info:
-  title: application.ChangeMonitoringSystem update events
+  title: ChangeMonitoringSystem update events
   version: 1.0.0
 channels: {}
 operations: {}
-

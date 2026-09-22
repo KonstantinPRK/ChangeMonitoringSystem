@@ -1,9 +1,8 @@
 package application.registration;
 
-public enum HealthStatus {
+public enum RemoteSystemStatus {
     STARTING,
     ACTIVE,
     UNAVAILABLE,
     STOPPING
 }
-

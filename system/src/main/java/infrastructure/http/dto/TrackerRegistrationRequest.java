@@ -1,11 +1,10 @@
-package application.tracker;
+package infrastructure.http.dto;
 
 import java.net.URI;
 import java.util.Set;
 
-public record TrackerDescriptor(
+public record TrackerRegistrationRequest(
     String trackerId,
-    String instanceId,
     String resourceProvider,
     URI baseUrl,
     int contractVersion,
@@ -13,4 +12,3 @@ public record TrackerDescriptor(
     Set<String> capabilities
 ) {
 }
-

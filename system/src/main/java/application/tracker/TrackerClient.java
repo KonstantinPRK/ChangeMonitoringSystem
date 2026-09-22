@@ -4,10 +4,13 @@ import java.net.URI;
 
 public interface TrackerClient {
     void addSubscription(
-        TrackerDescriptor tracker,
+        TrackerInstance tracker,
         URI resource,
         String botId,
         String localUserId
     );
-}
 
+
+    default void close() {
+    }
+}

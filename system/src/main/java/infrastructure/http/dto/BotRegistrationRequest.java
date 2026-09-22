@@ -1,11 +1,10 @@
-package application.bot;
+package infrastructure.http.dto;
 
 import java.net.URI;
 import java.util.Set;
 
-public record BotDescriptor(
+public record BotRegistrationRequest(
     String botId,
-    String instanceId,
     String botName,
     String communicationChannel,
     URI baseUrl,
@@ -13,4 +12,3 @@ public record BotDescriptor(
     Set<String> capabilities
 ) {
 }
-
