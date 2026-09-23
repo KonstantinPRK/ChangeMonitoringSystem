@@ -1,4 +1,4 @@
-package application.client;
+package application;
 
 public class SubscriptionClient {
 }

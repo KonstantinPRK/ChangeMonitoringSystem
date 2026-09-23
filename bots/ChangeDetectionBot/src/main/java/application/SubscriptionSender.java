@@ -1,4 +1,4 @@
-package application.sender;
+package application;
 
 public class SubscriptionSender {
 }

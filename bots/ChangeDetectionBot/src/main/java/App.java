@@ -1,4 +1,4 @@
-public final class ChangeDetectionBotApplication {
+public class App {
 
     public static void main(String[] args) {
     }

@@ -1,16 +1,12 @@
 package application;
 
 
-import application.client.SubscriptionClient;
-import application.client.TelegramClient;
 
 public class ChangeDetectionBot {
-    TelegramClient telegramClient;
-    SubscriptionClient subscriptionClient;
-
+    MessengerDispatcher dispatcher = new MessengerDispatcher();
 
     public void start(){
-
+        dispatcher.start();
     }
 
     private void working(){

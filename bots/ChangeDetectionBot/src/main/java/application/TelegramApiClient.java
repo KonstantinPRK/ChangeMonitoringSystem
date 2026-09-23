@@ -1,4 +1,4 @@
-package application.api;
+package application;
 
 public final class TelegramApiClient {
 

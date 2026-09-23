@@ -1,5 +1,7 @@
-package application.commandHandler;
+package application;
 
 public interface CommandHandler {
     void process();
+
+    String getRespond();
 }

@@ -1,10 +1,13 @@
 package application;
 
 public enum ConversationState {
-    IDLE,
-    WAITING_FOR_TRACK_LINK,
+    NEW,
+    STARTED,
+    WAITING_COMMAND,
+    WAITING_HELP,
     WAITING_FOR_TAGS,
     WAITING_FOR_FILTERS,
-    WAITING_FOR_UNTRACK_LINK
+    WAITING_FOR_UNTRACK_LINK,
+    STOPPED;
 }
 
