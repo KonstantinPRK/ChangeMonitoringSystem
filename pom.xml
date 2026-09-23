@@ -9,7 +9,7 @@
   <name>ChangeMonitoringSystemBuild</name>
 
   <modules>
-    <module>system</module>
+    <module>subscriptionServices/SubscriptionService</module>
     <module>bots/ChangeDetectionBot</module>
     <module>bots/UpdateTrackingSystemBot</module>
     <module>trackers/GitHubTracker</module>

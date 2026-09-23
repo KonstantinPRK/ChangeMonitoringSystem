@@ -19,6 +19,8 @@ target/
 .env.*
 **/.env
 **/.env.*
+!.env.example
+!**/.env.example
 
 # Accidental Maven metadata outside target
 pom.properties

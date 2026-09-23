@@ -1,12 +1,24 @@
 package application;
 
-import application.infrastructure.messaging.CommunicationClient;
 
-public final class ChangeDetectionBot {
-    CommunicationClient telegramClient;
-    MonitoringSystemClient monitoringSystemClient;
-    UserManager userManager;
+import application.client.SubscriptionClient;
+import application.client.TelegramClient;
+
+public class ChangeDetectionBot {
+    TelegramClient telegramClient;
+    SubscriptionClient subscriptionClient;
 
 
+    public void start(){
+
+    }
+
+    private void working(){
+
+    }
+
+    public void stop(){
+
+    }
 }
 

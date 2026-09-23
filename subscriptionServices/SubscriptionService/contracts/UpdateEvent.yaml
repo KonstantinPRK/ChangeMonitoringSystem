@@ -1,0 +1,6 @@
+asyncapi: 3.0.0
+info:
+  title: SubscriptionService update events
+  version: 1.0.0
+channels: {}
+operations: {}

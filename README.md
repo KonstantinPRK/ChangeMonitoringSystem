@@ -1,8 +1,8 @@
-# application.ChangeMonitoringSystem
+# ChangeMonitoringSystem
 
-application.ChangeMonitoringSystem is a Maven multi-module system made of five independently deployable Java services:
+ChangeMonitoringSystem is a Maven multi-module system made of five independently deployable Java services:
 
-- ChangeMonitoringSystem — runtime service registry and request router;
+- SubscriptionService — subscriptions, service registry and request routing;
 - ChangeDetectionBot — Telegram communication service;
 - UpdateTrackingSystemBot — VK communication service;
 - GitHubTracker — GitHub API monitoring service;
