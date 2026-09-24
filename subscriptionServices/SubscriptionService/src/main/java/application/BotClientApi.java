@@ -14,20 +14,16 @@ import java.util.concurrent.ConcurrentMap;
 
 public class BotClientApi {
     private static final String INTERACTIONS_PATH = "/api/v1/interactions";
-    private static final String AVAILABLE_SUBSCRIPTIONS_PATH =
-        INTERACTIONS_PATH + "/available";
-    private static final String NOTIFICATIONS_PATH =
-        INTERACTIONS_PATH + "/notifications/";
+    private static final String AVAILABLE_SUBSCRIPTIONS_PATH = INTERACTIONS_PATH + "/available";
+    private static final String NOTIFICATIONS_PATH = INTERACTIONS_PATH + "/notifications/";
 
     private static final int MAX_REQUEST_BODY_BYTES = 1_048_576;
     private static final int COMMAND_QUEUE_CAPACITY = 10_000;
     private static final int NOTIFICATION_QUEUE_CAPACITY = 10_000;
 
     private final ObjectMapper objectMapper;
-    private final BlockingQueue<BotInstruction> instructions =
-        new ArrayBlockingQueue<>(COMMAND_QUEUE_CAPACITY);
-    private final ConcurrentMap<String, BlockingQueue<Notification>>
-        notificationsByBot = new ConcurrentHashMap<>();
+    private final BlockingQueue<BotInstruction> instructions = new ArrayBlockingQueue<>(COMMAND_QUEUE_CAPACITY);
+    private final ConcurrentMap<String, BlockingQueue<Notification>> notificationsByBot = new ConcurrentHashMap<>();
 
     private volatile String[] availableSubscriptions = new String[0];
 
