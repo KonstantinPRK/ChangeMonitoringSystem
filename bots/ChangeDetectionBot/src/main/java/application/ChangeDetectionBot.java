@@ -1,5 +1,7 @@
 package application;
 
+import application.subscription.SubscriptionDataBridge;
+
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CountDownLatch;
@@ -7,7 +9,6 @@ import java.util.concurrent.CountDownLatch;
 @Component
 public class ChangeDetectionBot {
     private final SubscriptionDataBridge dataBridge;
-
     private final CountDownLatch terminationLatch = new CountDownLatch(1);
 
 
