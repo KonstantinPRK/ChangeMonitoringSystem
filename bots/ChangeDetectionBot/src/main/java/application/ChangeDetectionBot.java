@@ -1,20 +1,45 @@
 package application;
 
+import org.springframework.stereotype.Component;
 
+import java.util.concurrent.CountDownLatch;
 
+@Component
 public class ChangeDetectionBot {
-    MessengerDispatcher dispatcher = new MessengerDispatcher();
+    private final SubscriptionDataBridge dataBridge;
 
-    public void start(){
-        dispatcher.start();
+    private final CountDownLatch terminationLatch = new CountDownLatch(1);
+
+
+    public ChangeDetectionBot(SubscriptionDataBridge dataBridge) {
+        this.dataBridge = dataBridge;
     }
 
-    private void working(){
 
+    public void start() {
+        try {
+            dataBridge.start();
+
+        } catch (RuntimeException exception) {
+            terminationLatch.countDown();
+            throw exception;
+
+        }
     }
 
-    public void stop(){
 
+    public void awaitTermination() throws InterruptedException {
+        terminationLatch.await();
+    }
+
+
+    public void stop() {
+        try {
+            dataBridge.stop();
+
+        } finally {
+            terminationLatch.countDown();
+
+        }
     }
 }
-

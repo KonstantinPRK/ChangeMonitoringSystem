@@ -1,53 +1,65 @@
 package application;
 
-import java.util.concurrent.ExecutorService;
+import application.commandHandler.CommandType;
 
-public final class MessengerDispatcher {
-    private InteractionManager interactionManager;
-    private SubscriptionManager subscriptionManager;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
 
-    private ExecutorService executor;
+public class MessengerDispatcher {
+    TelegramClient telegramClient;
+    Executor executor;
 
+    private BlockingQueue<TelegramMessage> messageInputQueue = new ArrayBlockingQueue<>(100);
+    private BlockingQueue<TelegramMessage> messageOutputQueue = new ArrayBlockingQueue<>(100);
 
-
-    public void working() {
-        executor.submit(this::forwardNotifications);
-        executor.submit(this::forwardSubscriptions);
+    public void start(){
+        executor.execute(this::processIncomingMessages);
+        executor.execute(this::processOutgoingMessages);
     }
 
+    public void stop(){
 
-    public void stop() {
-        executor.shutdownNow();
     }
 
-
-    private void forwardNotifications() {
+    private void processOutgoingMessages() {
         try {
-            while (!Thread.currentThread().isInterrupted()) {
-                Notification[] notifications =
-                        subscriptionManager.takeNotifications();
+            while (true) {
+                TelegramMessage message = messageOutputQueue.take();
+                telegramClient.sendMessage(message);
 
-                interactionManager.putNotifications(notifications);
-            }
-        } catch (Exception exception) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-
-    private void forwardSubscriptions() {
-        try {
-            while (!Thread.currentThread().isInterrupted()) {
-                Subscription[] subscriptions =
-                        interactionManager.takeSubscriptions();
-
-                subscriptionManager.putSubscriptions(subscriptions);
             }
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
+
         }
     }
 
-    public void start() {
+
+    private void processIncomingMessages() {
+        try {
+            while (true) {
+                TelegramMessage message = messageInputQueue.take();
+
+            }
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+
+        }
+    }
+
+    public void sendMessage(String message) {
+        
+    }
+
+    public CommandType getCommand(User user) {
+        return null;
+    }
+
+    public String getMessage(User user) {
+        return null;
+    }
+
+    public void sendMessage() {
     }
 }

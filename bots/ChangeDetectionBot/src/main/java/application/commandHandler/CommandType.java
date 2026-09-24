@@ -1,4 +1,4 @@
-package application;
+package application.commandHandler;
 
 public enum CommandType {
     START("start"),

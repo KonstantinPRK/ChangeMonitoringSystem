@@ -1,6 +1,9 @@
 package application;
 
 
+import application.commandHandler.CommandHandler;
+import application.commandHandler.CommandType;
+
 import java.util.Map;
 
 
