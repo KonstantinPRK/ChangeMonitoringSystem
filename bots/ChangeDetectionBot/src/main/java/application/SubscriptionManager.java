@@ -18,4 +18,8 @@ public class SubscriptionManager {
     public Notification[] takeNotifications() {
         return null;
     }
+
+    public String[] getAvailableSubscriptions() {
+        return null;
+    }
 }
