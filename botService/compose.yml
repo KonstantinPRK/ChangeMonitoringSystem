@@ -1,0 +1,84 @@
+name: bot-service
+
+services:
+  bot-postgres:
+    container_name: bot-postgres
+    image: postgres:17.8-alpine
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - bot-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+  bot-redis:
+    container_name: bot-redis
+    image: redis:8.6-alpine
+    env_file:
+      - .env
+    command:
+      - /bin/sh
+      - -ec
+      - exec redis-server --appendonly yes --appendfsync everysec --requirepass "$$REDIS_PASSWORD"
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - bot-redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=$$REDIS_PASSWORD redis-cli ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+  bot-service:
+    container_name: bot-service
+    image: change-monitoring-system/bot-service:local
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      BOT_BASE_URL: http://bot-service:8081
+      SUBSCRIPTION_SERVICE_BASE_URL: http://subscription-service:8080
+      BOT_USER_DB_HOST: bot-postgres
+      BOT_USER_DB_PORT: 5432
+      BOT_REDIS_HOST: bot-redis
+      BOT_REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:19092
+    ports:
+      - "127.0.0.1:8081:8081"
+      - "127.0.0.1:9081:9081"
+    depends_on:
+      bot-postgres:
+        condition: service_healthy
+      bot-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9081/health/liveness >/dev/null"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 150s
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 60s
+
+networks:
+  default:
+    name: change-monitoring-system-network
+    external: true
+
+volumes:
+  bot-postgres-data:
+    name: change-monitoring-system_bot-postgres-data
+  bot-redis-data:
+    name: change-monitoring-system_bot-redis-data

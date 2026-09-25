@@ -1,0 +1,103 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {
+      "id": 1,
+      "title": "HTTP requests per second",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{application=~\"$application\"}[1m]))",
+          "legendFormat": "requests/s"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "title": "HTTP errors per second",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{application=~\"$application\",status=~\"4..|5..\"}[1m]))",
+          "legendFormat": "errors/s"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0}
+    },
+    {
+      "id": 3,
+      "title": "HTTP p95 duration",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{application=~\"$application\"}[5m])))",
+          "legendFormat": "p95"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0}
+    },
+    {
+      "id": 4,
+      "title": "JVM memory by area",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (area) (jvm_memory_used_bytes{application=~\"$application\"})",
+          "legendFormat": "{{area}}"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 8}
+    },
+    {
+      "id": 5,
+      "title": "User messages per second",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(bot_user_messages_total{application=~\"$application\"}[1m])",
+          "legendFormat": "incoming"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 8}
+    },
+    {
+      "id": 6,
+      "title": "Notifications and outgoing messages",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(bot_received_notifications_total{application=~\"$application\"}[1m])",
+          "legendFormat": "notifications"
+        },
+        {
+          "expr": "rate(bot_sent_messages_total{application=~\"$application\"}[1m])",
+          "legendFormat": "sent messages"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 8}
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 41,
+  "tags": ["ChangeMonitoringSystem", "bot"],
+  "templating": {
+    "list": [
+      {
+        "name": "application",
+        "label": "Application",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": "label_values(jvm_info, application)",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": true
+      }
+    ]
+  },
+  "time": {"from": "now-1h", "to": "now"},
+  "title": "BotService",
+  "uid": "change-detection-bot",
+  "version": 1
+}

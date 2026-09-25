@@ -1,0 +1,90 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: BotService
+  datasource:
+    url: jdbc:postgresql://${BOT_USER_DB_HOST:localhost}:${BOT_USER_DB_PORT:5433}/${BOT_USER_DB_NAME:change_detection_bot}
+    username: ${BOT_USER_DB_USER:change_detection_bot}
+    password: ${BOT_USER_DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: ${BOT_USER_DB_POOL_SIZE:10}
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${BOT_REDIS_HOST:localhost}
+      port: ${BOT_REDIS_PORT:6379}
+      password: ${BOT_REDIS_PASSWORD:}
+      database: ${BOT_REDIS_DATABASE:0}
+      client-type: jedis
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  lifecycle:
+    timeout-per-shutdown-phase: 45s
+
+server:
+  port: ${BOT_HTTP_PORT:8081}
+  shutdown: graceful
+
+management:
+  server:
+    port: ${BOT_MANAGEMENT_PORT:9081}
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health,info,prometheus
+      path-mapping:
+        prometheus: metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+
+app:
+  message-transport: ${MESSAGE_TRANSPORT:HTTP}
+  bot:
+    base-url: ${BOT_BASE_URL:http://localhost:8081}
+    internal-api-token: ${INTERNAL_API_TOKEN:}
+  telegram:
+    enabled: ${TELEGRAM_BOT_ENABLED:true}
+    bot-id: ${TELEGRAM_BOT_ID:${BOT_ID:telegram-main}}
+    token: ${TELEGRAM_BOT_TOKEN:}
+    long-poll-timeout: 30s
+    retry-delay: 2s
+  vk:
+    enabled: ${VK_BOT_ENABLED:false}
+    bot-id: ${VK_BOT_ID:vk-main}
+    token: ${VK_ACCESS_TOKEN:}
+    group-id: ${VK_GROUP_ID:0}
+    api-version: ${VK_API_VERSION:5.199}
+    long-poll-wait: 25s
+    retry-delay: 2s
+  subscription:
+    base-url: ${SUBSCRIPTION_SERVICE_BASE_URL:http://localhost:8080}
+    heartbeat-interval: 20s
+    request-retry-delay: 2s
+    cache-ttl-seconds: ${BOT_REDIS_TTL_SECONDS:300}
+    kafka:
+      topic: ${NOTIFICATION_TOPIC:subscription.notifications}
+      dead-letter-topic: ${NOTIFICATION_DLQ_TOPIC:subscription.notifications.dlq}
+      group-id: ${NOTIFICATION_GROUP_ID:BotService}
+  workers:
+    recovery-interval: 1s
+    retry-delay: 2s
+    maximum-attempts: 8

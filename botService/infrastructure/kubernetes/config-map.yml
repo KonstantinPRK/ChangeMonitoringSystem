@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bot-service-config
+data:
+  TELEGRAM_BOT_ENABLED: "true"
+  TELEGRAM_BOT_ID: telegram-main
+  VK_BOT_ENABLED: "false"
+  BOT_BASE_URL: http://bot-service:8081
+  BOT_HTTP_PORT: "8081"
+  BOT_MANAGEMENT_PORT: "9081"
+  BOT_USER_DB_HOST: bot-postgres
+  BOT_USER_DB_PORT: "5432"
+  BOT_USER_DB_NAME: change_detection_bot
+  BOT_USER_DB_USER: change_detection_bot
+  BOT_REDIS_HOST: bot-redis
+  BOT_REDIS_PORT: "6379"
+  BOT_REDIS_DATABASE: "0"
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  NOTIFICATION_TOPIC: subscription.notifications
+  NOTIFICATION_DLQ_TOPIC: subscription.notifications.dlq
+  MESSAGE_TRANSPORT: HTTP
+  SUBSCRIPTION_SERVICE_BASE_URL: http://subscription-service:8080

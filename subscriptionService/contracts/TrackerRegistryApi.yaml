@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: SubscriptionService Tracker Registry API
+  version: 1.0.0
+  description: |
+    Internal registry of independently running tracker services. Each tracker has one
+    unique trackerId and exclusively owns its normalized supportedHosts. Hosts are exact
+    domain names without wildcards, schemes, paths or ports; they are lowercased, converted
+    to ASCII IDN and stripped of a trailing dot. github.com and www.github.com are distinct.
+    A repeated registration replaces this tracker's URL and host list atomically, retaining
+    all previous data if any requested host belongs to a different tracker.
+    Availability timeout is app.registration.availability-timeout (default 30 seconds).
+    Expiry pauses outgoing delivery but retains host ownership. Explicitly deregister the
+    old tracker or re-register it with fewer hosts before handing those hosts to another ID.
+    A registered tracker may submit a delayed event for its own host after its lease expires.
+    Registrations are in memory: run one registry replica and re-register after restart.
+    If app.internal-api-token is configured, send it in Authorization: Bearer.
+security:
+  - internalBearer: []
+  - {}
+paths:
+  /internal/trackers:
+    post:
+      summary: Register or replace a tracker and its supportedHosts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackerRegistration'
+            example:
+              trackerId: gitHubTracker
+              baseUrl: http://github-tracker:8080
+              supportedHosts: [github.com]
+      responses:
+        '204':
+          description: Registered or replaced, availability renewed
+        '400':
+          description: Invalid ID, URL or supportedHosts
+        '401':
+          description: Missing or invalid token when authentication is configured
+        '409':
+          description: At least one supported host belongs to another registered tracker
+    get:
+      summary: List all registered trackers, including expired registrations
+      responses:
+        '200':
+          description: Registrations sorted by trackerId; availableUntil is an exclusive deadline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrackerInstance'
+        '401':
+          description: Missing or invalid token when authentication is configured
+  /internal/trackers/{trackerId}/availability:
+    parameters:
+      - $ref: '#/components/parameters/TrackerId'
+    put:
+      summary: Confirm availability and renew the deadline
+      responses:
+        '204':
+          description: Availability renewed, including for an expired registration
+        '400':
+          description: Invalid ID
+        '401':
+          description: Missing or invalid token when authentication is configured
+        '404':
+          description: Register this tracker before confirming availability
+  /internal/trackers/{trackerId}:
+    parameters:
+      - $ref: '#/components/parameters/TrackerId'
+    delete:
+      summary: Deregister a tracker and release all its supported hosts
+      responses:
+        '204':
+          description: Deregistered, or the tracker was already absent
+        '400':
+          description: Invalid ID
+        '401':
+          description: Missing or invalid token when authentication is configured
+components:
+  securitySchemes:
+    internalBearer:
+      type: http
+      scheme: bearer
+  parameters:
+    TrackerId:
+      name: trackerId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceId'
+  schemas:
+    ServiceId:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$'
+    TrackerRegistration:
+      type: object
+      required: [trackerId, baseUrl, supportedHosts]
+      properties:
+        trackerId:
+          $ref: '#/components/schemas/ServiceId'
+        baseUrl:
+          type: string
+          format: uri
+          description: |
+            Absolute HTTP(S) base URL, optionally including a context path.
+            No credentials, query or fragment. Local/Docker hostnames are allowed.
+            The service will POST tracking commands to baseUrl + /api/v1/links/requests.
+        supportedHosts:
+          type: array
+          minItems: 1
+          maxItems: 100
+          uniqueItems: true
+          items:
+            type: string
+            minLength: 1
+    TrackerInstance:
+      allOf:
+        - $ref: '#/components/schemas/TrackerRegistration'
+        - type: object
+          required: [availableUntil]
+          properties:
+            availableUntil:
+              type: string
+              format: date-time

@@ -1,0 +1,129 @@
+asyncapi: 3.0.0
+info:
+  title: SubscriptionService update events
+  version: 1.0.0
+  description: >-
+    HTTP and Kafka share the same update and notification JSON models.
+    Topic names below are defaults and are configured through app.kafka properties.
+    Events are delivered at least once. Keep eventId unchanged when retrying an update;
+    bots must deduplicate notifications by notificationId.
+channels:
+  trackerUpdates:
+    address: subscription.updates
+    description: app.kafka.update-topic; message key is the trackerId.
+    messages:
+      update:
+        $ref: '#/components/messages/TrackerUpdate'
+  botNotifications:
+    address: subscription.notifications
+    description: >-
+      app.kafka.notification-topic; message key is botId.
+      Each independent bot uses a different consumer group and filters its own botId.
+      A shared group would load-balance notifications to arbitrary bots and is not suitable.
+    messages:
+      notification:
+        $ref: '#/components/messages/BotNotification'
+  invalidUpdates:
+    address: subscription.updates.dlq
+    description: >-
+      app.kafka.dlq-topic; preserves the original invalid payload and key.
+      It may contain malformed JSON or null. Temporary processing failures are retried,
+      not sent to this topic. Offset advances only after broker-confirmed DLQ publication.
+    messages:
+      invalidUpdate:
+        name: InvalidTrackerUpdate
+        contentType: text/plain
+operations:
+  receiveTrackerUpdate:
+    action: receive
+    channel:
+      $ref: '#/channels/trackerUpdates'
+  sendBotNotification:
+    action: send
+    channel:
+      $ref: '#/channels/botNotifications'
+  sendInvalidUpdate:
+    action: send
+    channel:
+      $ref: '#/channels/invalidUpdates'
+components:
+  messages:
+    TrackerUpdate:
+      name: TrackerUpdate
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/LinkNotification'
+    BotNotification:
+      name: BotNotification
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/Notification'
+  schemas:
+    Link:
+      type: object
+      additionalProperties: false
+      required: [domain, address]
+      properties:
+        domain:
+          type: string
+          maxLength: 253
+          examples: [github.com]
+        address:
+          type: string
+          format: uri
+          maxLength: 2048
+          examples: [https://github.com/example/project]
+    User:
+      type: object
+      additionalProperties: false
+      required: [botId, userId, chatId]
+      properties:
+        botId:
+          type: string
+          maxLength: 128
+        userId:
+          type: string
+          maxLength: 128
+        chatId:
+          type: string
+          maxLength: 128
+    LinkNotification:
+      type: object
+      additionalProperties: false
+      required: [eventId, trackerId, link, message, occurredAt]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        trackerId:
+          type: string
+          maxLength: 128
+        link:
+          $ref: '#/components/schemas/Link'
+        message:
+          type: string
+          minLength: 1
+          maxLength: 10000
+        occurredAt:
+          type: string
+          format: date-time
+    Notification:
+      type: object
+      additionalProperties: false
+      required: [notificationId, eventId, user, link, message, occurredAt]
+      properties:
+        notificationId:
+          type: string
+          format: uuid
+        eventId:
+          type: string
+          format: uuid
+        user:
+          $ref: '#/components/schemas/User'
+        link:
+          $ref: '#/components/schemas/Link'
+        message:
+          type: string
+        occurredAt:
+          type: string
+          format: date-time

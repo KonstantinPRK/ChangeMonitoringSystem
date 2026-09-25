@@ -1,0 +1,115 @@
+openapi: 3.1.0
+info:
+  title: SubscriptionService Bot Registry API
+  version: 1.0.0
+  description: |
+    Internal registry of independently running bot services. Each bot has one unique botId.
+    A repeated registration replaces that bot's URL and renews availability; it does not
+    create an additional instance. Registry contents live in this SubscriptionService
+    process, so bots must register again after it restarts. Run one registry replica.
+    Send availability confirmations more often than app.registration.availability-timeout
+    (30 seconds by default). Expiry prevents delivery but does not delete the registration.
+    Registration endpoints are trusted infrastructure APIs. If app.internal-api-token is
+    configured, every request requires that shared token in Authorization: Bearer.
+security:
+  - internalBearer: []
+  - {}
+paths:
+  /internal/bots:
+    post:
+      summary: Register or replace the unique bot identified by botId
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BotRegistration'
+            example:
+              botId: ChangeDetectionBot
+              baseUrl: http://telegram-bot:8080
+      responses:
+        '204':
+          description: Registered or replaced, availability renewed
+        '400':
+          description: Invalid ID or HTTP(S) base URL
+        '401':
+          description: Missing or invalid token when authentication is configured
+    get:
+      summary: List all registered bots, including expired registrations
+      responses:
+        '200':
+          description: Registrations sorted by botId; availableUntil is an exclusive deadline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BotInstance'
+        '401':
+          description: Missing or invalid token when authentication is configured
+  /internal/bots/{botId}/availability:
+    parameters:
+      - $ref: '#/components/parameters/BotId'
+    put:
+      summary: Confirm that the bot is available and renew its deadline
+      responses:
+        '204':
+          description: Availability renewed, including for an expired registration
+        '400':
+          description: Invalid ID
+        '401':
+          description: Missing or invalid token when authentication is configured
+        '404':
+          description: Register this bot before confirming availability
+  /internal/bots/{botId}:
+    parameters:
+      - $ref: '#/components/parameters/BotId'
+    delete:
+      summary: Deregister a bot without deleting its users or subscriptions
+      responses:
+        '204':
+          description: Deregistered, or the bot was already absent
+        '400':
+          description: Invalid ID
+        '401':
+          description: Missing or invalid token when authentication is configured
+components:
+  securitySchemes:
+    internalBearer:
+      type: http
+      scheme: bearer
+  parameters:
+    BotId:
+      name: botId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/ServiceId'
+  schemas:
+    ServiceId:
+      type: string
+      minLength: 1
+      maxLength: 128
+      pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$'
+    BotRegistration:
+      type: object
+      required: [botId, baseUrl]
+      properties:
+        botId:
+          $ref: '#/components/schemas/ServiceId'
+        baseUrl:
+          type: string
+          format: uri
+          description: |
+            Absolute HTTP(S) base URL, optionally including a context path.
+            No credentials, query or fragment. Local/Docker hostnames are allowed.
+            The service will POST notifications to baseUrl + /api/v1/notifications.
+    BotInstance:
+      allOf:
+        - $ref: '#/components/schemas/BotRegistration'
+        - type: object
+          required: [availableUntil]
+          properties:
+            availableUntil:
+              type: string
+              format: date-time

@@ -1,0 +1,85 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: TrackerService
+  datasource:
+    url: jdbc:postgresql://${TRACKER_SERVICE_DB_HOST:localhost}:${TRACKER_SERVICE_DB_PORT:5434}/${TRACKER_SERVICE_DB_NAME:${POSTGRES_DB:tracker_service}}
+    username: ${TRACKER_SERVICE_DB_USER:${POSTGRES_USER:tracker_service}}
+    password: ${TRACKER_SERVICE_DB_PASSWORD:${POSTGRES_PASSWORD:}}
+    hikari:
+      maximum-pool-size: ${TRACKER_SERVICE_DB_POOL_SIZE:10}
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${TRACKER_SERVICE_REDIS_HOST:localhost}
+      port: ${TRACKER_SERVICE_REDIS_PORT:6380}
+      password: ${TRACKER_SERVICE_REDIS_PASSWORD:${REDIS_PASSWORD:}}
+      database: ${TRACKER_SERVICE_REDIS_DATABASE:0}
+      client-type: jedis
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+server:
+  port: ${TRACKER_SERVICE_HTTP_PORT:8082}
+  shutdown: graceful
+
+management:
+  server:
+    port: ${TRACKER_SERVICE_MANAGEMENT_PORT:9082}
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health,info,prometheus
+      path-mapping:
+        prometheus: metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+
+app:
+  message-transport: ${MESSAGE_TRANSPORT:HTTP}
+  tracker:
+    id: ${TRACKER_SERVICE_ID:TrackerService}
+    base-url: ${TRACKER_SERVICE_BASE_URL:http://localhost:8082}
+    internal-api-token: ${INTERNAL_API_TOKEN:}
+    availability-interval: 20s
+  github:
+    api-url: https://api.github.com
+    token: ${GITHUB_TOKEN:}
+    api-version: "2022-11-28"
+    request-timeout: 15s
+    scrape-interval: 60s
+    supported-hosts: ${GITHUB_SUPPORTED_HOSTS:github.com,www.github.com}
+  stack-overflow:
+    api-url: https://api.stackexchange.com/2.3/
+    site: stackoverflow
+    key: ${STACK_OVERFLOW_KEY:}
+    request-timeout: 15s
+    scrape-interval: 60s
+    supported-hosts: ${STACK_OVERFLOW_SUPPORTED_HOSTS:stackoverflow.com,www.stackoverflow.com}
+  subscription-service:
+    base-url: ${SUBSCRIPTION_SERVICE_BASE_URL:http://localhost:8080}
+    synchronization-interval: 30s
+    synchronization-lease: 30s
+    request-retry-delay: 2s
+  workers:
+    recovery-interval: 1s
+    claim-lease: 60s
+    maximum-concurrency: 8
+  kafka:
+    update-topic: ${TRACKER_UPDATE_TOPIC:subscription.updates}

@@ -1,0 +1,77 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {
+      "title": "HTTP request rate",
+      "type": "timeseries",
+      "targets": [{"expr": "sum(rate(http_server_requests_seconds_count{application=\"$application\"}[1m]))", "legendFormat": "requests/s", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0}
+    },
+    {
+      "title": "HTTP 5xx rate",
+      "type": "timeseries",
+      "targets": [{"expr": "sum(rate(http_server_requests_seconds_count{application=\"$application\",status=~\"5..\"}[1m]))", "legendFormat": "errors/s", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0}
+    },
+    {
+      "title": "HTTP p95 duration",
+      "type": "timeseries",
+      "targets": [{"expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{application=\"$application\"}[5m])))", "legendFormat": "p95", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0}
+    },
+    {
+      "title": "JVM memory",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (area) (jvm_memory_used_bytes{application=\"$application\"})", "legendFormat": "{{area}}", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+    },
+    {
+      "title": "Active resources",
+      "type": "timeseries",
+      "targets": [{"expr": "tracker_active_resources{application=\"$application\"}", "legendFormat": "{{provider}} / {{type}}", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+    },
+    {
+      "title": "Scrape percentiles",
+      "type": "timeseries",
+      "targets": [
+        {"expr": "histogram_quantile(0.50, sum by (le, provider, type) (rate(tracker_scrape_duration_seconds_bucket{application=\"$application\"}[5m])))", "legendFormat": "p50 {{provider}} / {{type}}", "refId": "A"},
+        {"expr": "histogram_quantile(0.95, sum by (le, provider, type) (rate(tracker_scrape_duration_seconds_bucket{application=\"$application\"}[5m])))", "legendFormat": "p95 {{provider}} / {{type}}", "refId": "B"},
+        {"expr": "histogram_quantile(0.99, sum by (le, provider, type) (rate(tracker_scrape_duration_seconds_bucket{application=\"$application\"}[5m])))", "legendFormat": "p99 {{provider}} / {{type}}", "refId": "C"}
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+    },
+    {
+      "title": "Scrape outcomes",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (provider, type, result) (rate(tracker_scrape_total{application=\"$application\"}[1m]))", "legendFormat": "{{provider}} / {{type}} / {{result}}", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 16}
+    },
+    {
+      "title": "Notification publications",
+      "type": "timeseries",
+      "targets": [{"expr": "sum by (result) (rate(tracker_notifications_published_total{application=\"$application\"}[1m]))", "legendFormat": "{{result}}", "refId": "A"}],
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 16}
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 41,
+  "tags": ["tracker", "github", "stackoverflow"],
+  "templating": {
+    "list": [
+      {
+        "name": "application",
+        "type": "query",
+        "datasource": "Prometheus",
+        "query": {"query": "label_values(application)", "refId": "PrometheusVariableQueryEditor-VariableQuery"},
+        "current": {"text": "TrackerService", "value": "TrackerService"},
+        "refresh": 1
+      }
+    ]
+  },
+  "time": {"from": "now-1h", "to": "now"},
+  "title": "TrackerService",
+  "uid": "tracker-service",
+  "version": 1
+}

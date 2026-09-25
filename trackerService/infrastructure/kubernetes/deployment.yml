@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracker-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tracker-service
+  template:
+    metadata:
+      labels:
+        app: tracker-service
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: tracker-service
+          image: change-monitoring-system/tracker-service:local
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: tracker-service-config
+            - secretRef:
+                name: tracker-service-secrets
+          ports:
+            - name: http
+              containerPort: 8082
+            - name: management
+              containerPort: 9082
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: management
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: management
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: temporary
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+      volumes:
+        - name: temporary
+          emptyDir: {}

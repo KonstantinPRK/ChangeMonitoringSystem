@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 10s
+
+scrape_configs:
+  - job_name: application-services
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - bot-service:9081
+          - subscription-service:9080
+          - tracker-service:9082

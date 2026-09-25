@@ -9,11 +9,9 @@
   <name>ChangeMonitoringSystemBuild</name>
 
   <modules>
-    <module>subscriptionServices/SubscriptionService</module>
-    <module>bots/ChangeDetectionBot</module>
-    <module>bots/UpdateTrackingSystemBot</module>
-    <module>trackers/GitHubTracker</module>
-    <module>trackers/StackOverflowTracker</module>
+    <module>subscriptionService</module>
+    <module>botService</module>
+    <module>trackerService</module>
   </modules>
 
   <properties>
@@ -23,60 +21,17 @@
     <maven.compiler.parameters>true</maven.compiler.parameters>
     <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
     <maven.enforcer.plugin.version>3.6.2</maven.enforcer.plugin.version>
-    <maven.jar.plugin.version>3.4.1</maven.jar.plugin.version>
-    <maven.shade.plugin.version>3.6.1</maven.shade.plugin.version>
-    <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
-    <spring.framework.version>7.0.9</spring.framework.version>
-    <jackson.version>2.20.0</jackson.version>
-    <hikaricp.version>7.1.0</hikaricp.version>
-    <postgresql.version>42.7.13</postgresql.version>
-    <junit.version>6.1.2</junit.version>
-    <testcontainers.version>2.0.5</testcontainers.version>
-    <jspecify.version>1.0.1</jspecify.version>
+    <spring.boot.version>4.1.1</spring.boot.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-framework-bom</artifactId>
-        <version>${spring.framework.version}</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${spring.boot.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.junit</groupId>
-        <artifactId>junit-bom</artifactId>
-        <version>${junit.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>testcontainers-bom</artifactId>
-        <version>${testcontainers.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.zaxxer</groupId>
-        <artifactId>HikariCP</artifactId>
-        <version>${hikaricp.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>${postgresql.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jspecify</groupId>
-        <artifactId>jspecify</artifactId>
-        <version>${jspecify.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -91,62 +46,9 @@
           <version>${maven.compiler.plugin.version}</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>${maven.jar.plugin.version}</version>
-          <configuration>
-            <!-- Shade replaces the main artifact with a fat JAR. Recreate the
-                 thin JAR on every build so repeated `mvn verify` calls do not
-                 shade an already shaded artifact. -->
-            <forceCreation>true</forceCreation>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven.surefire.plugin.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>${maven.shade.plugin.version}</version>
-          <executions>
-            <execution>
-              <phase>package</phase>
-              <goals>
-                <goal>shade</goal>
-              </goals>
-              <configuration>
-                <createDependencyReducedPom>false</createDependencyReducedPom>
-                <filters>
-                  <filter>
-                    <artifact>*:*</artifact>
-                    <excludes>
-                      <exclude>module-info.class</exclude>
-                      <exclude>META-INF/versions/*/module-info.class</exclude>
-                    </excludes>
-                  </filter>
-                </filters>
-                <transformers>
-                  <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                    <resource>META-INF/spring.handlers</resource>
-                  </transformer>
-                  <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                    <resource>META-INF/spring.schemas</resource>
-                  </transformer>
-                  <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                    <resource>META-INF/spring.tooling</resource>
-                  </transformer>
-                  <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                    <resource>META-INF/spring/aot.factories</resource>
-                  </transformer>
-                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                    <mainClass>${main.class}</mainClass>
-                  </transformer>
-                </transformers>
-              </configuration>
-            </execution>
-          </executions>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-maven-plugin</artifactId>
+          <version>${spring.boot.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>

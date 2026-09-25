@@ -1,0 +1,84 @@
+name: tracker-service
+
+services:
+  tracker-postgres:
+    container_name: tracker-postgres
+    image: postgres:17.8-alpine
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - tracker-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+  tracker-redis:
+    container_name: tracker-redis
+    image: redis:8.6-alpine
+    env_file:
+      - .env
+    command:
+      - /bin/sh
+      - -ec
+      - exec redis-server --appendonly yes --appendfsync everysec $${REDIS_PASSWORD:+--requirepass "$$REDIS_PASSWORD"}
+    ports:
+      - "127.0.0.1:6380:6379"
+    volumes:
+      - tracker-redis-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli $${REDIS_PASSWORD:+-a \"$$REDIS_PASSWORD\"} ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+  tracker-service:
+    container_name: tracker-service
+    image: change-monitoring-system/tracker-service:local
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      TRACKER_SERVICE_BASE_URL: http://tracker-service:8082
+      SUBSCRIPTION_SERVICE_BASE_URL: http://subscription-service:8080
+      TRACKER_SERVICE_DB_HOST: tracker-postgres
+      TRACKER_SERVICE_DB_PORT: 5432
+      TRACKER_SERVICE_REDIS_HOST: tracker-redis
+      TRACKER_SERVICE_REDIS_PORT: 6379
+      KAFKA_BOOTSTRAP_SERVERS: kafka:19092
+    ports:
+      - "127.0.0.1:8082:8082"
+      - "127.0.0.1:9082:9082"
+    depends_on:
+      tracker-postgres:
+        condition: service_healthy
+      tracker-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9082/health/liveness >/dev/null"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 150s
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 60s
+
+networks:
+  default:
+    name: change-monitoring-system-network
+    external: true
+
+volumes:
+  tracker-postgres-data:
+    name: change-monitoring-system_tracker-postgres-data
+  tracker-redis-data:
+    name: change-monitoring-system_tracker-redis-data

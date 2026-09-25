@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subscription-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: subscription-service
+  template:
+    metadata:
+      labels:
+        app: subscription-service
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: application
+          image: change-monitoring-system/subscription-service:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - {name: http, containerPort: 8080}
+            - {name: management, containerPort: 9080}
+          env:
+            - {name: SERVER_ADDRESS, value: '0.0.0.0'}
+            - {name: MANAGEMENT_SERVER_ADDRESS, value: '0.0.0.0'}
+            - {name: MANAGEMENT_SERVER_PORT, value: '9080'}
+            - {name: SPRING_DATASOURCE_URL, value: 'jdbc:postgresql://postgres:5432/subscription_service'}
+            - {name: SPRING_DATASOURCE_USERNAME, value: subscription_service}
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: subscription-service-secrets, key: database-password}
+            - {name: SPRING_DATA_REDIS_HOST, value: redis}
+            - {name: SPRING_DATA_REDIS_PORT, value: '6379'}
+            - name: SPRING_DATA_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: subscription-service-secrets, key: redis-password}
+            - name: SUBSCRIPTION_INTERNAL_API_TOKEN
+              valueFrom:
+                secretKeyRef: {name: subscription-service-secrets, key: internal-api-token}
+            - {name: SPRING_KAFKA_BOOTSTRAP_SERVERS, value: 'kafka:9092'}
+            - {name: SUBSCRIPTION_MESSAGE_TRANSPORT, value: HTTP}
+          startupProbe:
+            httpGet: {path: /health/liveness, port: management}
+            periodSeconds: 5
+            failureThreshold: 30
+          readinessProbe:
+            httpGet: {path: /health/readiness, port: management}
+          livenessProbe:
+            httpGet: {path: /health/liveness, port: management}
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits: {cpu: '1', memory: 768Mi}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - {name: temporary, mountPath: /tmp}
+      volumes:
+        - name: temporary
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subscription-service
+spec:
+  selector:
+    app: subscription-service
+  ports:
+    - {name: http, port: 8080, targetPort: http}
+    - {name: management, port: 9080, targetPort: management}
