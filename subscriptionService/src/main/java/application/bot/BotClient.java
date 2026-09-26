@@ -5,6 +5,9 @@ import application.notification.Notification;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Предоставляет доступ к операциям удалённого сервиса через {@code BotClient}.
+ */
 @Component
 public class BotClient {
     private final BotRouter router;

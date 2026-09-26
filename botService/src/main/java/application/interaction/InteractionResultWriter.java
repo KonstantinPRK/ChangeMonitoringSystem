@@ -11,6 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Реализует ответственность компонента {@code InteractionResultWriter}.
+ */
 @Component
 public class InteractionResultWriter {
     private final ConversationSessionRepository sessionRepository;

@@ -9,6 +9,9 @@ import application.work.NotificationWorkSignal;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Реализует ответственность компонента {@code NotificationOutbox}.
+ */
 @Component
 public class NotificationOutbox {
     private final NotificationEventFactory eventFactory;

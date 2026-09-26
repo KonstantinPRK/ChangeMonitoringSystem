@@ -6,7 +6,7 @@ import application.user.BotUser;
 import application.user.UserKey;
 import application.user.UserStatus;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -14,22 +14,24 @@ import java.sql.SQLException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static application.persistence.DatabaseTime.from;
 
+/**
+ * Отвечает за сохранение и чтение данных {@code SubscriptionOperationRepository}.
+ */
 @Repository
 public class SubscriptionOperationRepository {
     private static final Duration CLAIM_LEASE = Duration.ofSeconds(60);
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
     private final JsonValues jsonValues;
     private final Clock clock;
 
 
-    public SubscriptionOperationRepository(JdbcTemplate jdbcTemplate, JsonValues jsonValues, Clock clock) {
-        this.jdbcTemplate = jdbcTemplate;
+    public SubscriptionOperationRepository(JdbcClient jdbcClient, JsonValues jsonValues, Clock clock) {
+        this.jdbcClient = jdbcClient;
         this.jsonValues = jsonValues;
         this.clock = clock;
     }
@@ -37,40 +39,44 @@ public class SubscriptionOperationRepository {
 
     public void save(UUID operationId, BotUser user, SubscriptionOperationDraft draft) {
         Link link = draft.link();
-        jdbcTemplate.update(
-                """
+        Instant now = clock.instant();
+
+        jdbcClient.sql("""
                 INSERT INTO subscription_operations (
                     id, operation_type, user_id, link_domain, link_address,
                     tags_json, filters_json, status, available_at, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', ?, ?)
+                ) VALUES (
+                    :id, :operationType, :userId, :linkDomain, :linkAddress,
+                    :tags, :filters, 'PENDING', :availableAt, :createdAt
+                )
                 ON CONFLICT (id) DO NOTHING
-                """,
-                operationId,
-                draft.type().name(),
-                user.id(),
-                link == null ? null : link.domain(),
-                link == null ? null : link.address(),
-                jsonValues.writeStrings(draft.tags()),
-                jsonValues.writeStrings(draft.filters()),
-                from(clock.instant()),
-                from(clock.instant())
-        );
+                """)
+                .param("id", operationId)
+                .param("operationType", draft.type().name())
+                .param("userId", user.id())
+                .param("linkDomain", link == null ? null : link.domain())
+                .param("linkAddress", link == null ? null : link.address())
+                .param("tags", jsonValues.writeStrings(draft.tags()))
+                .param("filters", jsonValues.writeStrings(draft.filters()))
+                .param("availableAt", from(now))
+                .param("createdAt", from(now))
+                .update();
     }
 
 
     public Optional<StoredSubscriptionOperation> claimNext() {
         Instant now = clock.instant();
         UUID claimToken = UUID.randomUUID();
-        List<StoredSubscriptionOperation> operations = jdbcTemplate.query(
-                """
+
+        return jdbcClient.sql("""
                 WITH claimed AS (
                     UPDATE subscription_operations
                     SET status = 'PROCESSING', attempts = attempts + 1,
-                        locked_until = ?, claim_token = ?
+                        locked_until = :lockedUntil, claim_token = :claimToken
                     WHERE id = (
                         SELECT id FROM subscription_operations
-                        WHERE (status IN ('PENDING', 'RETRY') AND available_at <= ?)
-                           OR (status = 'PROCESSING' AND locked_until <= ?)
+                        WHERE (status IN ('PENDING', 'RETRY') AND available_at <= :now)
+                           OR (status = 'PROCESSING' AND locked_until <= :now)
                         ORDER BY created_at
                         FOR UPDATE SKIP LOCKED
                         LIMIT 1
@@ -81,57 +87,52 @@ public class SubscriptionOperationRepository {
                        users.chat_id, users.status AS user_status, users.created_at AS user_created_at
                 FROM claimed
                 JOIN bot_users users ON users.id = claimed.user_id
-                """,
-                this::mapOperation,
-                from(now.plus(CLAIM_LEASE)),
-                claimToken,
-                from(now),
-                from(now)
-        );
-        return operations.stream().findFirst();
+                """)
+                .param("lockedUntil", from(now.plus(CLAIM_LEASE)))
+                .param("claimToken", claimToken)
+                .param("now", from(now))
+                .query(this::mapOperation)
+                .optional();
     }
 
 
     public void complete(StoredSubscriptionOperation operation) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE subscription_operations
                 SET status = 'COMPLETED', locked_until = NULL, claim_token = NULL
-                WHERE id = ? AND claim_token = ?
-                """,
-                operation.id(),
-                operation.claimToken()
-        );
+                WHERE id = :id AND claim_token = :claimToken
+                """)
+                .param("id", operation.id())
+                .param("claimToken", operation.claimToken())
+                .update();
     }
 
 
     public void retry(StoredSubscriptionOperation operation, Duration delay, String error) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE subscription_operations
-                SET status = 'RETRY', available_at = ?, last_error = ?,
+                SET status = 'RETRY', available_at = :availableAt, last_error = :error,
                     locked_until = NULL, claim_token = NULL
-                WHERE id = ? AND claim_token = ?
-                """,
-                from(clock.instant().plus(delay)),
-                error,
-                operation.id(),
-                operation.claimToken()
-        );
+                WHERE id = :id AND claim_token = :claimToken
+                """)
+                .param("availableAt", from(clock.instant().plus(delay)))
+                .param("error", error)
+                .param("id", operation.id())
+                .param("claimToken", operation.claimToken())
+                .update();
     }
 
 
     public void fail(StoredSubscriptionOperation operation, String error) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE subscription_operations
-                SET status = 'FAILED', last_error = ?, locked_until = NULL, claim_token = NULL
-                WHERE id = ? AND claim_token = ?
-                """,
-                error,
-                operation.id(),
-                operation.claimToken()
-        );
+                SET status = 'FAILED', last_error = :error, locked_until = NULL, claim_token = NULL
+                WHERE id = :id AND claim_token = :claimToken
+                """)
+                .param("error", error)
+                .param("id", operation.id())
+                .param("claimToken", operation.claimToken())
+                .update();
     }
 
 

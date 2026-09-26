@@ -15,6 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 
+/**
+ * Формирует запросы внешнего протокола для {@code SubscriptionHttpRequestFactory}.
+ */
 @Component
 public class SubscriptionHttpRequestFactory {
     private static final String JSON = "application/json";

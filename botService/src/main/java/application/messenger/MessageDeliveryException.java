@@ -2,6 +2,9 @@ package application.messenger;
 
 import java.time.Duration;
 
+/**
+ * Сигнализирует об ошибке, представленной типом {@code MessageDeliveryException}.
+ */
 public class MessageDeliveryException extends RuntimeException {
     private final boolean permanent;
     private final Duration retryAfter;

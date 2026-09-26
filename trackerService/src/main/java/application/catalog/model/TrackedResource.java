@@ -2,6 +2,9 @@ package application.catalog.model;
 
 import java.util.UUID;
 
+/**
+ * Передаёт между компонентами данные {@code TrackedResource}.
+ */
 public record TrackedResource(
         long id,
         long subscriptionLinkId,

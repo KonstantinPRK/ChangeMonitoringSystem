@@ -7,6 +7,9 @@ import application.interaction.UserInteraction;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Обрабатывает полученную задачу через {@code IncomingMessageProcessor}.
+ */
 @Component
 public class IncomingMessageProcessor {
     private final IncomingMessageRepository messageRepository;

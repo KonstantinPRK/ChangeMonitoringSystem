@@ -9,6 +9,9 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.net.http.HttpResponse;
 
+/**
+ * Читает и преобразует входные данные для {@code NotificationReceiptReader}.
+ */
 @Component
 public class NotificationReceiptReader {
     private final SubscriptionResponseValidator responseValidator;

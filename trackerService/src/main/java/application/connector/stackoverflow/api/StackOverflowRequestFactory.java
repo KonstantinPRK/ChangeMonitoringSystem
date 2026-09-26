@@ -9,6 +9,9 @@ import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Формирует запросы внешнего протокола для {@code StackOverflowRequestFactory}.
+ */
 @Component
 public class StackOverflowRequestFactory {
     private final StackOverflowProperties properties;

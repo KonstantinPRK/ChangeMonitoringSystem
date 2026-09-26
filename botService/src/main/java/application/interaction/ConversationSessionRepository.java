@@ -2,27 +2,29 @@ package application.interaction;
 
 import application.persistence.JsonValues;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Clock;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static application.persistence.DatabaseTime.from;
 
+/**
+ * Отвечает за сохранение и чтение данных {@code ConversationSessionRepository}.
+ */
 @Repository
 public class ConversationSessionRepository {
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
     private final JsonValues jsonValues;
     private final Clock clock;
 
 
-    public ConversationSessionRepository(JdbcTemplate jdbcTemplate, JsonValues jsonValues, Clock clock) {
-        this.jdbcTemplate = jdbcTemplate;
+    public ConversationSessionRepository(JdbcClient jdbcClient, JsonValues jsonValues, Clock clock) {
+        this.jdbcClient = jdbcClient;
         this.jsonValues = jsonValues;
         this.clock = clock;
     }
@@ -39,39 +41,36 @@ public class ConversationSessionRepository {
 
 
     public void save(ConversationSession session) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 INSERT INTO conversation_sessions (
                     user_id, state, draft_link, tags_json, filters_json, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?)
+                ) VALUES (:userId, :state, :draftLink, :tags, :filters, :updatedAt)
                 ON CONFLICT (user_id) DO UPDATE SET
                     state = EXCLUDED.state,
                     draft_link = EXCLUDED.draft_link,
                     tags_json = EXCLUDED.tags_json,
                     filters_json = EXCLUDED.filters_json,
                     updated_at = EXCLUDED.updated_at
-                """,
-                session.userId(),
-                session.state().name(),
-                session.draftLink(),
-                jsonValues.writeStrings(session.tags()),
-                jsonValues.writeStrings(session.filters()),
-                from(clock.instant())
-        );
+                """)
+                .param("userId", session.userId())
+                .param("state", session.state().name())
+                .param("draftLink", session.draftLink())
+                .param("tags", jsonValues.writeStrings(session.tags()))
+                .param("filters", jsonValues.writeStrings(session.filters()))
+                .param("updatedAt", from(clock.instant()))
+                .update();
     }
 
 
     private Optional<ConversationSession> find(UUID userId) {
-        List<ConversationSession> sessions = jdbcTemplate.query(
-                """
+        return jdbcClient.sql("""
                 SELECT user_id, state, draft_link, tags_json, filters_json
                 FROM conversation_sessions
-                WHERE user_id = ?
-                """,
-                this::mapSession,
-                userId
-        );
-        return sessions.stream().findFirst();
+                WHERE user_id = :userId
+                """)
+                .param("userId", userId)
+                .query(this::mapSession)
+                .optional();
     }
 
 

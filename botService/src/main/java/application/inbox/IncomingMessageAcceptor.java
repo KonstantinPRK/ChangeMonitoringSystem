@@ -10,6 +10,9 @@ import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Принимает и сохраняет входные данные через {@code IncomingMessageAcceptor}.
+ */
 @Service
 public class IncomingMessageAcceptor {
     private final IncomingMessageRepository messageRepository;

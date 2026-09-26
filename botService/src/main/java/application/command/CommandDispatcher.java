@@ -10,6 +10,9 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Передаёт ожидающие задачи подходящим обработчикам через {@code CommandDispatcher}.
+ */
 @Component
 public class CommandDispatcher {
     private final CommandParser commandParser;

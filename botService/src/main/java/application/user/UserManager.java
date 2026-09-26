@@ -5,6 +5,9 @@ import application.messenger.MessengerClientRegistry;
 
 import org.springframework.stereotype.Service;
 
+/**
+ * Координирует совместную работу компонентов через {@code UserManager}.
+ */
 @Service
 public class UserManager {
     private final MessengerClientRegistry clientRegistry;

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Обрабатывает один сценарий через {@code TrackFiltersStepHandler}.
+ */
 @Component
 public class TrackFiltersStepHandler implements ConversationStepHandler {
     private final LinkParser linkParser;

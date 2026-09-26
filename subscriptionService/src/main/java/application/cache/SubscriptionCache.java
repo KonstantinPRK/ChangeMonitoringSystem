@@ -13,6 +13,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Кэширует данные, используемые компонентом {@code SubscriptionCache}.
+ */
 @Component
 public class SubscriptionCache {
     private final StringRedisTemplate redis;

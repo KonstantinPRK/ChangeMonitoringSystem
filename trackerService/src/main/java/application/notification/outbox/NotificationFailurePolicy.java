@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
+/**
+ * Определяет решение после ошибки через {@code NotificationFailurePolicy}.
+ */
 @Component
 public class NotificationFailurePolicy {
     private final SubscriptionServiceProperties serviceProperties;

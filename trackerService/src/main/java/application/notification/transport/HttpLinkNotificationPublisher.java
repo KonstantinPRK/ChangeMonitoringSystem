@@ -11,6 +11,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Публикует данные во внешний транспорт через {@code HttpLinkNotificationPublisher}.
+ */
 @Component
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "HTTP", matchIfMissing = true)
 public class HttpLinkNotificationPublisher implements LinkNotificationPublisher {

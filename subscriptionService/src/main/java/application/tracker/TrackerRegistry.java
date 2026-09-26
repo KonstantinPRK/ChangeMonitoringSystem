@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Хранит и находит зарегистрированные компоненты через {@code TrackerRegistry}.
+ */
 @Component
 public class TrackerRegistry {
     private final Map<String, TrackerInstance> trackersById = new HashMap<>();

@@ -1,35 +1,39 @@
 package application.catalog.persistence;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.util.List;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
 import static application.transaction.DatabaseTime.from;
 
+/**
+ * Отвечает за сохранение и чтение данных {@code LinkSynchronizationRepository}.
+ */
 @Repository
 public class LinkSynchronizationRepository {
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
     private final Clock clock;
 
 
-    public LinkSynchronizationRepository(JdbcTemplate jdbcTemplate, Clock clock) {
-        this.jdbcTemplate = jdbcTemplate;
+    public LinkSynchronizationRepository(JdbcClient jdbcClient, Clock clock) {
+        this.jdbcClient = jdbcClient;
         this.clock = clock;
     }
 
 
     public Optional<UUID> start(String trackerId, Duration lease) {
         UUID generation = UUID.randomUUID();
-        List<UUID> generations = jdbcTemplate.query(
-                """
+        Instant now = clock.instant();
+
+        return jdbcClient.sql("""
                 INSERT INTO link_synchronizations (
                     tracker_id, generation_id, after_id, status, started_at, lease_until
-                ) VALUES (?, ?, 0, 'RUNNING', ?, ?)
+                ) VALUES (:trackerId, :generation, 0, 'RUNNING', :startedAt, :leaseUntil)
                 ON CONFLICT (tracker_id) DO UPDATE SET
                     generation_id = EXCLUDED.generation_id,
                     after_id = 0,
@@ -41,14 +45,13 @@ public class LinkSynchronizationRepository {
                 WHERE link_synchronizations.status <> 'RUNNING'
                    OR link_synchronizations.lease_until <= EXCLUDED.started_at
                 RETURNING generation_id
-                """,
-                (resultSet, rowNumber) -> resultSet.getObject("generation_id", UUID.class),
-                trackerId,
-                generation,
-                from(clock.instant()),
-                from(clock.instant().plus(lease))
-        );
-        return generations.stream().findFirst();
+                """)
+                .param("trackerId", trackerId)
+                .param("generation", generation)
+                .param("startedAt", from(now))
+                .param("leaseUntil", from(now.plus(lease)))
+                .query(UUID.class)
+                .optional();
     }
 
 
@@ -58,57 +61,57 @@ public class LinkSynchronizationRepository {
             long afterId,
             Duration lease
     ) {
-        jdbcTemplate.update(
-                """
-                UPDATE link_synchronizations SET after_id = ?, lease_until = ?
-                WHERE tracker_id = ? AND generation_id = ? AND status = 'RUNNING'
-                """,
-                afterId,
-                from(clock.instant().plus(lease)),
-                trackerId,
-                generation
-        );
+        jdbcClient.sql("""
+                UPDATE link_synchronizations SET after_id = :afterId, lease_until = :leaseUntil
+                WHERE tracker_id = :trackerId
+                  AND generation_id = :generation
+                  AND status = 'RUNNING'
+                """)
+                .param("afterId", afterId)
+                .param("leaseUntil", from(clock.instant().plus(lease)))
+                .param("trackerId", trackerId)
+                .param("generation", generation)
+                .update();
     }
 
 
     public boolean lockOwnedGeneration(String trackerId, UUID generation) {
-        List<Integer> ownedGenerations = jdbcTemplate.query(
-                """
+        return jdbcClient.sql("""
                 SELECT 1 FROM link_synchronizations
-                WHERE tracker_id = ? AND generation_id = ? AND status = 'RUNNING'
+                WHERE tracker_id = :trackerId
+                  AND generation_id = :generation
+                  AND status = 'RUNNING'
                 FOR UPDATE
-                """,
-                (resultSet, rowNumber) -> resultSet.getInt(1),
-                trackerId,
-                generation
-        );
-        return !ownedGenerations.isEmpty();
+                """)
+                .param("trackerId", trackerId)
+                .param("generation", generation)
+                .query(Integer.class)
+                .optional()
+                .isPresent();
     }
 
 
     public void complete(String trackerId, UUID generation) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE link_synchronizations
-                SET status = 'COMPLETED', completed_at = ?
-                WHERE tracker_id = ? AND generation_id = ?
-                """,
-                from(clock.instant()),
-                trackerId,
-                generation
-        );
+                SET status = 'COMPLETED', completed_at = :completedAt
+                WHERE tracker_id = :trackerId AND generation_id = :generation
+                """)
+                .param("completedAt", from(clock.instant()))
+                .param("trackerId", trackerId)
+                .param("generation", generation)
+                .update();
     }
 
 
     public void fail(String trackerId, UUID generation, String error) {
-        jdbcTemplate.update(
-                """
-                UPDATE link_synchronizations SET status = 'FAILED', last_error = ?
-                WHERE tracker_id = ? AND generation_id = ?
-                """,
-                error,
-                trackerId,
-                generation
-        );
+        jdbcClient.sql("""
+                UPDATE link_synchronizations SET status = 'FAILED', last_error = :error
+                WHERE tracker_id = :trackerId AND generation_id = :generation
+                """)
+                .param("error", error)
+                .param("trackerId", trackerId)
+                .param("generation", generation)
+                .update();
     }
 }

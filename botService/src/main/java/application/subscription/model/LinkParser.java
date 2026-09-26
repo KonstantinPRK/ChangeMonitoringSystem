@@ -4,6 +4,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 
+/**
+ * Читает и преобразует входные данные для {@code LinkParser}.
+ */
 @Component
 public class LinkParser {
     public Link parse(String value) {

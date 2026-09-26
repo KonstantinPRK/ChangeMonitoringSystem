@@ -6,6 +6,9 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
 
+/**
+ * Реализует ответственность компонента {@code StackOverflowQuotaGate}.
+ */
 @Component
 public class StackOverflowQuotaGate {
     private final StackOverflowQuotaCache quotaCache;

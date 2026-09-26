@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Обрабатывает один сценарий через {@code TrackTagsStepHandler}.
+ */
 @Component
 public class TrackTagsStepHandler implements ConversationStepHandler {
     private final TextListParser textListParser;

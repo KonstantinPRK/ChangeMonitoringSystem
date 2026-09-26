@@ -9,6 +9,9 @@ import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Координирует совместную работу компонентов через {@code LinkNotificationManager}.
+ */
 @Service
 public class LinkNotificationManager {
     private final LinkParser linkParser;

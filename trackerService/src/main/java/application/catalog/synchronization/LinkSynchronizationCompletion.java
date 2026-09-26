@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+/**
+ * Завершает обработку и фиксирует её результат через {@code LinkSynchronizationCompletion}.
+ */
 @Component
 public class LinkSynchronizationCompletion {
     private final TrackerProperties trackerProperties;

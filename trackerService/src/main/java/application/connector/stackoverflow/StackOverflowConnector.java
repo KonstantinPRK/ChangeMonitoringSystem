@@ -16,6 +16,9 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Реализует ответственность компонента {@code StackOverflowConnector}.
+ */
 @Component
 public class StackOverflowConnector implements TrackingConnector {
     private final ConnectorDescriptor descriptor;

@@ -25,6 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Предоставляет HTTP-эндпоинты компонента {@code BotClientApi}.
+ */
 @RestController
 @RequestMapping("/api/v1")
 @Validated

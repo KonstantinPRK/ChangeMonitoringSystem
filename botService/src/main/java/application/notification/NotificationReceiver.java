@@ -14,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
+/**
+ * Реализует ответственность компонента {@code NotificationReceiver}.
+ */
 @Service
 public class NotificationReceiver {
     private final MessengerClientRegistry clientRegistry;
@@ -46,6 +49,7 @@ public class NotificationReceiver {
                 notification.user().userId(),
                 notification.user().chatId()
         );
+
         BotUser user;
         try {
             user = userManager.find(userKey);
@@ -54,15 +58,28 @@ public class NotificationReceiver {
             throw new InvalidNotificationException("Notification recipient is unknown", exception);
 
         }
+
         if (!notificationRepository.save(notification, user.id())) return;
 
-        String message = notification.message() + "\n" + notification.link().address();
+        String message = formatMessage(notification);
+
         outgoingMessageService.enqueue(
                 "notification:" + notification.notificationId(),
                 user,
                 message
         );
+
         receivedNotifications.increment();
+    }
+
+
+    private String formatMessage(BotNotification notification) {
+        String message = notification.message();
+        String address = notification.link().address();
+
+        if (message.contains(address)) return message;
+
+        return message + '\n' + address;
     }
 
 

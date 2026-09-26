@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Регистрирует и обновляет метрики компонента {@code ActiveLinkMetrics}.
+ */
 @Component
 public class ActiveLinkMetrics {
     private final LinkRepository linkRepository;

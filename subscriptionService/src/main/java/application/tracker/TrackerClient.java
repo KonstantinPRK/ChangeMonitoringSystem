@@ -5,6 +5,9 @@ import application.link.LinkRequest;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Предоставляет доступ к операциям удалённого сервиса через {@code TrackerClient}.
+ */
 @Component
 public class TrackerClient {
     private final TrackerRouter router;

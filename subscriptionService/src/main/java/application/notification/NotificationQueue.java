@@ -6,6 +6,9 @@ import application.queue.QueueStore;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Хранит ожидающие обработки элементы в {@code NotificationQueue}.
+ */
 @Component
 public class NotificationQueue {
     private final QueueStore queue;

@@ -10,6 +10,9 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Получает события внешнего транспорта через {@code KafkaUpdateListener}.
+ */
 @Component
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "KAFKA")
 public class KafkaUpdateListener {

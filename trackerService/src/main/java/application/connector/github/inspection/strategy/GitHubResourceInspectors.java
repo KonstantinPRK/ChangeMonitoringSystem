@@ -8,6 +8,9 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Реализует ответственность компонента {@code GitHubResourceInspectors}.
+ */
 @Component
 public class GitHubResourceInspectors {
     private final Map<GitHubResourceType, GitHubResourceInspector> inspectors =

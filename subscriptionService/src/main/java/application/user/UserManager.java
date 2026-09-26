@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Координирует совместную работу компонентов через {@code UserManager}.
+ */
 @Service
 public class UserManager {
     private final UserDatabase userDatabase;

@@ -13,6 +13,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+/**
+ * Реализует ответственность компонента {@code InternalApiAuthentication}.
+ */
 @Component
 @Order(1)
 public class InternalApiAuthentication extends OncePerRequestFilter {

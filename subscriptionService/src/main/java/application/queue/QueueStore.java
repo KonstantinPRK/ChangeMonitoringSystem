@@ -8,6 +8,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Хранит и извлекает данные {@code QueueStore}.
+ */
 @Repository
 public class QueueStore {
     private final JdbcClient database;

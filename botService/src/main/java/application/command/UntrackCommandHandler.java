@@ -7,6 +7,9 @@ import application.user.BotUser;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Обрабатывает один сценарий через {@code UntrackCommandHandler}.
+ */
 @Component
 public class UntrackCommandHandler implements CommandHandler {
     @Override

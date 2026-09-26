@@ -12,6 +12,9 @@ import org.springframework.util.backoff.FixedBackOff;
 import java.time.Duration;
 import java.util.Map;
 
+/**
+ * Создаёт и связывает Spring-компоненты для {@code KafkaConfiguration}.
+ */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "KAFKA")
 public class KafkaConfiguration {

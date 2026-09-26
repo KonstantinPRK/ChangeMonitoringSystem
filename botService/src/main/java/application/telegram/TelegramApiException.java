@@ -2,6 +2,9 @@ package application.telegram;
 
 import java.time.Duration;
 
+/**
+ * Сигнализирует об ошибке, представленной типом {@code TelegramApiException}.
+ */
 public class TelegramApiException extends RuntimeException {
     private final int errorCode;
     private final Duration retryAfter;

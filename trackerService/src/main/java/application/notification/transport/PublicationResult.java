@@ -2,6 +2,9 @@ package application.notification.transport;
 
 import java.time.Duration;
 
+/**
+ * Передаёт между компонентами данные {@code PublicationResult}.
+ */
 public record PublicationResult(PublicationStatus status, Duration retryAfter, String reason) {
     public static PublicationResult completed() {
         return new PublicationResult(PublicationStatus.COMPLETED, Duration.ZERO, "");

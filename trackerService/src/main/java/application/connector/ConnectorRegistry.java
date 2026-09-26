@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * Хранит и находит зарегистрированные компоненты через {@code ConnectorRegistry}.
+ */
 @Component
 public class ConnectorRegistry {
     private final Map<String, TrackingConnector> connectorsByKey;

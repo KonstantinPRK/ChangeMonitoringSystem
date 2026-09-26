@@ -11,6 +11,9 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Преобразует внешний адрес в доменную модель через {@code StackOverflowLinkResolver}.
+ */
 @Component
 public class StackOverflowLinkResolver implements LinkResolver {
     private final StackOverflowProperties properties;

@@ -16,6 +16,9 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет HTTP-запросы к удалённому сервису для {@code TrackerRegistrationApiClient}.
+ */
 @Component
 public class TrackerRegistrationApiClient {
     private final HttpClient httpClient;

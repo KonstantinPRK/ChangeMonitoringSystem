@@ -9,6 +9,9 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.Set;
 
+/**
+ * Читает и преобразует входные данные для {@code NotificationJsonReader}.
+ */
 @Component
 public class NotificationJsonReader {
     private final ObjectMapper objectMapper;

@@ -10,6 +10,9 @@ import application.user.UserManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Координирует совместную работу компонентов через {@code SubscriptionManager}.
+ */
 @Service
 public class SubscriptionManager {
     private final UserManager userManager;

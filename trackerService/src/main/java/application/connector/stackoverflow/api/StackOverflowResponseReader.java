@@ -22,6 +22,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Читает и преобразует входные данные для {@code StackOverflowResponseReader}.
+ */
 @Component
 public class StackOverflowResponseReader {
     private final ObjectMapper objectMapper;

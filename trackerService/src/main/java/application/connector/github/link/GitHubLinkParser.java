@@ -9,6 +9,9 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Читает и преобразует входные данные для {@code GitHubLinkParser}.
+ */
 @Component
 public class GitHubLinkParser {
     public GitHubTarget parse(String address) {

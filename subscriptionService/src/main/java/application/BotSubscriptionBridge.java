@@ -11,6 +11,9 @@ import application.subscriptions.SubscriptionRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * Передаёт данные между независимыми частями приложения через {@code BotSubscriptionBridge}.
+ */
 @Component
 public class BotSubscriptionBridge {
     private final ExchangeDataChannel exchange;

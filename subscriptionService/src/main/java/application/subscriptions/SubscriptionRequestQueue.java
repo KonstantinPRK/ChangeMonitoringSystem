@@ -7,6 +7,9 @@ import application.queue.QueueStore;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Хранит ожидающие обработки элементы в {@code SubscriptionRequestQueue}.
+ */
 @Component
 public class SubscriptionRequestQueue {
     private final QueueStore queue;

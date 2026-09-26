@@ -15,6 +15,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Отправляет данные во внешний транспорт через {@code VkMessageSender}.
+ */
 @Component
 public class VkMessageSender implements MessageSender {
     private static final Set<Integer> PERMANENT_ERROR_CODES = Set.of(5, 7, 100, 901, 902, 917);

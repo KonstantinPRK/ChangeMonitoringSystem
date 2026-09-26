@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+/**
+ * Создаёт доменные или протокольные объекты через {@code NotificationFactory}.
+ */
 @Component
 public class NotificationFactory {
 

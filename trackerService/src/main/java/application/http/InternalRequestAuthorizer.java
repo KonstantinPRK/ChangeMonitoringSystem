@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+/**
+ * Проверяет право на выполнение внутреннего запроса через {@code InternalRequestAuthorizer}.
+ */
 @Component
 @Order(1)
 public class InternalRequestAuthorizer extends OncePerRequestFilter {

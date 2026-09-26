@@ -9,6 +9,9 @@ import application.messenger.MessengerType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+/**
+ * Предоставляет доступ к операциям удалённого сервиса через {@code VkMessengerClient}.
+ */
 @Component
 @ConditionalOnProperty(name = "app.vk.enabled", havingValue = "true")
 public class VkMessengerClient implements MessengerClient {

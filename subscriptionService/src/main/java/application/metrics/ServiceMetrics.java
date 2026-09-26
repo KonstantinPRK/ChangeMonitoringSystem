@@ -8,6 +8,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Регистрирует и обновляет метрики компонента {@code ServiceMetrics}.
+ */
 @Component
 public class ServiceMetrics {
     private static final String[] DELIVERY_KINDS = {

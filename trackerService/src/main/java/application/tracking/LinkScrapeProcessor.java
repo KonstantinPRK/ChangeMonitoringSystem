@@ -14,6 +14,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Обрабатывает полученную задачу через {@code LinkScrapeProcessor}.
+ */
 @Component
 public class LinkScrapeProcessor {
     private final ConnectorRouter connectorRouter;

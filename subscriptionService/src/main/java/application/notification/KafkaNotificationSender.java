@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
+/**
+ * Отправляет данные во внешний транспорт через {@code KafkaNotificationSender}.
+ */
 @Component
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "KAFKA")
 public class KafkaNotificationSender implements NotificationSender {

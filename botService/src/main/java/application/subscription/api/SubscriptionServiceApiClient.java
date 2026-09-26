@@ -9,6 +9,9 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет HTTP-запросы к удалённому сервису для {@code SubscriptionServiceApiClient}.
+ */
 @Component
 public class SubscriptionServiceApiClient {
     private final HttpClient httpClient;

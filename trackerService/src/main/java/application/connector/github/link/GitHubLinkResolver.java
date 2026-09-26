@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
+/**
+ * Преобразует внешний адрес в доменную модель через {@code GitHubLinkResolver}.
+ */
 @Component
 public class GitHubLinkResolver implements LinkResolver {
     private final GitHubLinkParser linkParser;

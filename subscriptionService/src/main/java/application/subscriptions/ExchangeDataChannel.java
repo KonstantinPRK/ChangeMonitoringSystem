@@ -6,6 +6,9 @@ import application.queue.QueueReceipt;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Реализует ответственность компонента {@code ExchangeDataChannel}.
+ */
 @Component
 public class ExchangeDataChannel {
     private final SubscriptionManager subscriptions;

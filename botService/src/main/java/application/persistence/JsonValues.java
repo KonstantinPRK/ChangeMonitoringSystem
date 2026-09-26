@@ -7,6 +7,9 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
+/**
+ * Читает и преобразует входные данные для {@code JsonValues}.
+ */
 @Component
 public class JsonValues {
     private static final TypeReference<List<String>> STRING_LIST = new TypeReference<>() {

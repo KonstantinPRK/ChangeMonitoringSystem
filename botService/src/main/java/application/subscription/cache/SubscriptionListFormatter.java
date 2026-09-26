@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Реализует ответственность компонента {@code SubscriptionListFormatter}.
+ */
 @Component
 public class SubscriptionListFormatter {
     public String format(List<SubscriptionView> subscriptions) {

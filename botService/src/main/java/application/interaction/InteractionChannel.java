@@ -5,6 +5,9 @@ import application.user.BotUser;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Реализует ответственность компонента {@code InteractionChannel}.
+ */
 @Component
 public class InteractionChannel {
     private final CommandDispatcher commandDispatcher;

@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Координирует совместную работу компонентов через {@code BotManager}.
+ */
 @Service
 public class BotManager {
     private final BotRegistry botRegistry;

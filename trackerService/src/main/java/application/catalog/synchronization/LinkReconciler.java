@@ -13,6 +13,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Согласует локальное и удалённое состояние через {@code LinkReconciler}.
+ */
 @Component
 public class LinkReconciler {
     private final ConnectorRouter connectorRouter;

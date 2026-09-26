@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Регистрирует и обновляет метрики компонента {@code NotificationMetrics}.
+ */
 @Component
 public class NotificationMetrics {
     private final MeterRegistry meterRegistry;

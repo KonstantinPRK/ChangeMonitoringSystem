@@ -2,7 +2,7 @@ package application.inbox;
 
 import application.messenger.IncomingMessage;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -10,140 +10,137 @@ import java.sql.SQLException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static application.persistence.DatabaseTime.from;
 
+/**
+ * Отвечает за сохранение и чтение данных {@code IncomingMessageRepository}.
+ */
 @Repository
 public class IncomingMessageRepository {
     private static final Duration CLAIM_LEASE = Duration.ofSeconds(60);
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
     private final Clock clock;
 
 
-    public IncomingMessageRepository(JdbcTemplate jdbcTemplate, Clock clock) {
-        this.jdbcTemplate = jdbcTemplate;
+    public IncomingMessageRepository(JdbcClient jdbcClient, Clock clock) {
+        this.jdbcClient = jdbcClient;
         this.clock = clock;
     }
 
 
     public void save(String botId, IncomingMessage message) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 INSERT INTO incoming_messages (
                     id, source, external_id, external_user_id, chat_id, text,
                     received_at, status, available_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)
+                ) VALUES (
+                    :id, :source, :externalId, :externalUserId, :chatId, :text,
+                    :receivedAt, 'PENDING', :availableAt
+                )
                 ON CONFLICT (source, external_id) DO NOTHING
-                """,
-                UUID.randomUUID(),
-                botId,
-                message.externalId(),
-                message.externalUserId(),
-                message.chatId(),
-                message.text(),
-                from(message.receivedAt()),
-                from(clock.instant())
-        );
+                """)
+                .param("id", UUID.randomUUID())
+                .param("source", botId)
+                .param("externalId", message.externalId())
+                .param("externalUserId", message.externalUserId())
+                .param("chatId", message.chatId())
+                .param("text", message.text())
+                .param("receivedAt", from(message.receivedAt()))
+                .param("availableAt", from(clock.instant()))
+                .update();
     }
 
 
     public void saveCheckpoint(String botId, long nextOffset) {
-        jdbcTemplate.update(
-                """
-                INSERT INTO messenger_checkpoints (source, next_offset) VALUES (?, ?)
+        jdbcClient.sql("""
+                INSERT INTO messenger_checkpoints (source, next_offset) VALUES (:source, :nextOffset)
                 ON CONFLICT (source) DO UPDATE SET next_offset = GREATEST(
                     messenger_checkpoints.next_offset,
                     EXCLUDED.next_offset
                 )
-                """,
-                botId,
-                nextOffset
-        );
+                """)
+                .param("source", botId)
+                .param("nextOffset", nextOffset)
+                .update();
     }
 
 
     public long checkpoint(String botId) {
-        List<Long> offsets = jdbcTemplate.query(
-                "SELECT next_offset FROM messenger_checkpoints WHERE source = ?",
-                (resultSet, rowNumber) -> resultSet.getLong("next_offset"),
-                botId
-        );
-        return offsets.stream().findFirst().orElse(0L);
+        return jdbcClient.sql("SELECT next_offset FROM messenger_checkpoints WHERE source = :source")
+                .param("source", botId)
+                .query(Long.class)
+                .optional()
+                .orElse(0L);
     }
 
 
     public Optional<StoredIncomingMessage> claimNext() {
         Instant now = clock.instant();
         UUID claimToken = UUID.randomUUID();
-        List<StoredIncomingMessage> messages = jdbcTemplate.query(
-                """
+
+        return jdbcClient.sql("""
                 UPDATE incoming_messages
                 SET status = 'PROCESSING', attempts = attempts + 1,
-                    locked_until = ?, claim_token = ?
+                    locked_until = :lockedUntil, claim_token = :claimToken
                 WHERE id = (
                     SELECT id FROM incoming_messages
-                    WHERE (status IN ('PENDING', 'RETRY') AND available_at <= ?)
-                       OR (status = 'PROCESSING' AND locked_until <= ?)
+                    WHERE (status IN ('PENDING', 'RETRY') AND available_at <= :now)
+                       OR (status = 'PROCESSING' AND locked_until <= :now)
                     ORDER BY received_at
                     FOR UPDATE SKIP LOCKED
                     LIMIT 1
                 )
                 RETURNING id, source, external_id, external_user_id, chat_id,
                           text, received_at, attempts, claim_token
-                """,
-                this::mapMessage,
-                from(now.plus(CLAIM_LEASE)),
-                claimToken,
-                from(now),
-                from(now)
-        );
-        return messages.stream().findFirst();
+                """)
+                .param("lockedUntil", from(now.plus(CLAIM_LEASE)))
+                .param("claimToken", claimToken)
+                .param("now", from(now))
+                .query(this::mapMessage)
+                .optional();
     }
 
 
     public void complete(StoredIncomingMessage message) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE incoming_messages
                 SET status = 'COMPLETED', locked_until = NULL, claim_token = NULL
-                WHERE id = ? AND claim_token = ?
-                """,
-                message.id(),
-                message.claimToken()
-        );
+                WHERE id = :id AND claim_token = :claimToken
+                """)
+                .param("id", message.id())
+                .param("claimToken", message.claimToken())
+                .update();
     }
 
 
     public void retry(StoredIncomingMessage message, Duration delay, String error) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE incoming_messages
-                SET status = 'RETRY', available_at = ?, last_error = ?,
+                SET status = 'RETRY', available_at = :availableAt, last_error = :error,
                     locked_until = NULL, claim_token = NULL
-                WHERE id = ? AND claim_token = ?
-                """,
-                from(clock.instant().plus(delay)),
-                error,
-                message.id(),
-                message.claimToken()
-        );
+                WHERE id = :id AND claim_token = :claimToken
+                """)
+                .param("availableAt", from(clock.instant().plus(delay)))
+                .param("error", error)
+                .param("id", message.id())
+                .param("claimToken", message.claimToken())
+                .update();
     }
 
 
     public void fail(StoredIncomingMessage message, String error) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE incoming_messages
-                SET status = 'FAILED', last_error = ?, locked_until = NULL, claim_token = NULL
-                WHERE id = ? AND claim_token = ?
-                """,
-                error,
-                message.id(),
-                message.claimToken()
-        );
+                SET status = 'FAILED', last_error = :error, locked_until = NULL, claim_token = NULL
+                WHERE id = :id AND claim_token = :claimToken
+                """)
+                .param("error", error)
+                .param("id", message.id())
+                .param("claimToken", message.claimToken())
+                .update();
     }
 
 

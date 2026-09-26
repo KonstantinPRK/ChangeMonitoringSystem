@@ -1,5 +1,8 @@
 package application.catalog.api;
 
+/**
+ * Сигнализирует об ошибке, представленной типом {@code SubscriptionServiceException}.
+ */
 public class SubscriptionServiceException extends RuntimeException {
     private final int statusCode;
 

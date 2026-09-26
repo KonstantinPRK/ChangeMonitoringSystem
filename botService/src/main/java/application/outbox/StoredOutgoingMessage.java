@@ -2,6 +2,9 @@ package application.outbox;
 
 import java.util.UUID;
 
+/**
+ * Передаёт между компонентами данные {@code StoredOutgoingMessage}.
+ */
 public record StoredOutgoingMessage(
         UUID id,
         String botId,

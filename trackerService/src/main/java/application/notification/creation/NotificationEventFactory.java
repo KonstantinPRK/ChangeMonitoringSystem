@@ -14,6 +14,9 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.Clock;
 import java.util.UUID;
 
+/**
+ * Создаёт доменные или протокольные объекты через {@code NotificationEventFactory}.
+ */
 @Component
 public class NotificationEventFactory {
     private final TrackerProperties trackerProperties;

@@ -2,6 +2,9 @@ package application.bot;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Выбирает подходящего получателя запроса через {@code BotRouter}.
+ */
 @Component
 public class BotRouter {
     private final BotRegistry registry;

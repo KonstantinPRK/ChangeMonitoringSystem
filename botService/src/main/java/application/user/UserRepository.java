@@ -2,27 +2,29 @@ package application.user;
 
 import application.messenger.MessengerType;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static application.persistence.DatabaseTime.from;
 
+/**
+ * Отвечает за сохранение и чтение данных {@code UserRepository}.
+ */
 @Repository
 public class UserRepository {
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
     private final Clock clock;
 
 
-    public UserRepository(JdbcTemplate jdbcTemplate, Clock clock) {
-        this.jdbcTemplate = jdbcTemplate;
+    public UserRepository(JdbcClient jdbcClient, Clock clock) {
+        this.jdbcClient = jdbcClient;
         this.clock = clock;
     }
 
@@ -33,56 +35,55 @@ public class UserRepository {
 
         Instant now = clock.instant();
         UUID userId = UUID.randomUUID();
-        jdbcTemplate.update(
-                """
+
+        jdbcClient.sql("""
                 INSERT INTO bot_users (
                     id, bot_id, messenger, external_user_id, chat_id, status, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, 'ACTIVE', ?, ?)
+                ) VALUES (:id, :botId, :messenger, :externalUserId, :chatId, 'ACTIVE', :createdAt, :updatedAt)
                 ON CONFLICT (bot_id, messenger, external_user_id, chat_id) DO NOTHING
-                """,
-                userId,
-                key.botId(),
-                messengerType.name(),
-                key.externalUserId(),
-                key.chatId(),
-                from(now),
-                from(now)
-        );
+                """)
+                .param("id", userId)
+                .param("botId", key.botId())
+                .param("messenger", messengerType.name())
+                .param("externalUserId", key.externalUserId())
+                .param("chatId", key.chatId())
+                .param("createdAt", from(now))
+                .param("updatedAt", from(now))
+                .update();
+
         return find(key).orElseThrow();
     }
 
 
     public Optional<BotUser> find(UserKey key) {
-        List<BotUser> users = jdbcTemplate.query(
-                """
+        return jdbcClient.sql("""
                 SELECT id, bot_id, messenger, external_user_id, chat_id, status, created_at
                 FROM bot_users
-                WHERE bot_id = ? AND external_user_id = ? AND chat_id = ?
-                """,
-                this::mapUser,
-                key.botId(),
-                key.externalUserId(),
-                key.chatId()
-        );
-        return users.stream().findFirst();
+                WHERE bot_id = :botId
+                  AND external_user_id = :externalUserId
+                  AND chat_id = :chatId
+                """)
+                .param("botId", key.botId())
+                .param("externalUserId", key.externalUserId())
+                .param("chatId", key.chatId())
+                .query(this::mapUser)
+                .optional();
     }
 
 
     public void activate(UUID userId) {
-        jdbcTemplate.update(
-                "UPDATE bot_users SET status = 'ACTIVE', updated_at = ? WHERE id = ?",
-                from(clock.instant()),
-                userId
-        );
+        jdbcClient.sql("UPDATE bot_users SET status = 'ACTIVE', updated_at = :updatedAt WHERE id = :userId")
+                .param("updatedAt", from(clock.instant()))
+                .param("userId", userId)
+                .update();
     }
 
 
     public void markDeleted(UUID userId) {
-        jdbcTemplate.update(
-                "UPDATE bot_users SET status = 'DELETED', updated_at = ? WHERE id = ?",
-                from(clock.instant()),
-                userId
-        );
+        jdbcClient.sql("UPDATE bot_users SET status = 'DELETED', updated_at = :updatedAt WHERE id = :userId")
+                .param("updatedAt", from(clock.instant()))
+                .param("userId", userId)
+                .update();
     }
 
 

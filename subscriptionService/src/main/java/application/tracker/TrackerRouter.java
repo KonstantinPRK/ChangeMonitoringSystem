@@ -4,6 +4,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Выбирает подходящего получателя запроса через {@code TrackerRouter}.
+ */
 @Component
 public class TrackerRouter {
     private final TrackerRegistry registry;

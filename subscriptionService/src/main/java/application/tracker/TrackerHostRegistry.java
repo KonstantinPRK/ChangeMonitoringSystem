@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Хранит принадлежность поддерживаемых хостов зарегистрированным трекерам.
+ */
 class TrackerHostRegistry {
     private final Map<String, String> trackerIdsByHost = new HashMap<>();
     private final RegistrationValidator validator;

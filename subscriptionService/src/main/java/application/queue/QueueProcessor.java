@@ -13,6 +13,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+/**
+ * Обрабатывает полученную задачу через {@code QueueProcessor}.
+ */
 @Component
 public class QueueProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueueProcessor.class);

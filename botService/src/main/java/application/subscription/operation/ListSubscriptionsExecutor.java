@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет прикладную операцию через {@code ListSubscriptionsExecutor}.
+ */
 @Component
 public class ListSubscriptionsExecutor implements SubscriptionOperationExecutor {
     private final SubscriptionListLoader listLoader;

@@ -5,6 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.net.URI;
 import java.time.Duration;
 
+/**
+ * Передаёт между компонентами данные {@code TrackerProperties}.
+ */
 @ConfigurationProperties("app.tracker")
 public record TrackerProperties(
         String id,

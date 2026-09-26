@@ -9,6 +9,9 @@ import application.messenger.MessengerType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+/**
+ * Предоставляет доступ к операциям удалённого сервиса через {@code TelegramMessengerClient}.
+ */
 @Component
 @ConditionalOnProperty(name = "app.telegram.enabled", havingValue = "true", matchIfMissing = true)
 public class TelegramMessengerClient implements MessengerClient {

@@ -5,6 +5,9 @@ import application.outbox.OutgoingMessageService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Завершает обработку и фиксирует её результат через {@code SubscriptionOperationCompletion}.
+ */
 @Component
 public class SubscriptionOperationCompletion {
     private final SubscriptionOperationRepository operationRepository;
@@ -42,7 +45,7 @@ public class SubscriptionOperationCompletion {
         outgoingMessageService.enqueue(
                 "operation-failed:" + operation.id(),
                 operation.user(),
-                "Не удалось выполнить операцию: " + failure.getMessage()
+                "Не удалось выполнить операцию. Попробуйте ещё раз позже."
         );
     }
 }

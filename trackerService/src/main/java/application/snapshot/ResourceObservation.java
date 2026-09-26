@@ -1,5 +1,8 @@
 package application.snapshot;
 
+/**
+ * Передаёт между компонентами данные {@code ResourceObservation}.
+ */
 public record ResourceObservation(
         String versionToken,
         boolean notModified,

@@ -8,6 +8,9 @@ import application.user.BotUser;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Обрабатывает один сценарий через {@code StopCommandHandler}.
+ */
 @Component
 public class StopCommandHandler implements CommandHandler {
     @Override

@@ -1,38 +1,94 @@
 package application.user;
 
-import application.persistence.SubscriptionEntity;
+import application.link.Link;
 
-import jakarta.persistence.EntityManager;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Читает подписки со стороны пользователя.
+ */
 @Repository
 public class UserToLinksDatabase {
-    private final EntityManager entities;
+    private final JdbcClient jdbcClient;
 
 
-    public UserToLinksDatabase(EntityManager entities) {
-        this.entities = entities;
+    public UserToLinksDatabase(JdbcClient jdbcClient) {
+        this.jdbcClient = jdbcClient;
     }
 
 
     public Optional<SubscriptionListVersion> version(User user) {
-        return entities.createQuery("""
-                SELECT new application.user.SubscriptionListVersion(u.id, u.subscriptionsRevision)
-                FROM UserEntity u WHERE u.botId = :bot AND u.userId = :user AND u.chatId = :chat
-                """, SubscriptionListVersion.class)
-                .setParameter("bot", user.botId()).setParameter("user", user.userId()).setParameter("chat", user.chatId())
-                .getResultStream().findFirst();
+        return jdbcClient.sql("""
+                SELECT id, subscriptions_revision
+                FROM service_users
+                WHERE bot_id = :botId AND user_id = :userId AND chat_id = :chatId
+                """)
+                .param("botId", user.botId())
+                .param("userId", user.userId())
+                .param("chatId", user.chatId())
+                .query((resultSet, rowNumber) -> new SubscriptionListVersion(
+                        resultSet.getLong("id"),
+                        resultSet.getLong("subscriptions_revision")
+                ))
+                .optional();
     }
 
 
     public List<SubscriptionView> read(long userId, int offset, int limit) {
-        return entities.createQuery("""
-                SELECT s FROM SubscriptionEntity s JOIN FETCH s.link
-                WHERE s.user.id = :user ORDER BY s.id
-                """, SubscriptionEntity.class).setParameter("user", userId).setFirstResult(offset).setMaxResults(limit)
-                .getResultList().stream().map(SubscriptionEntity::toView).toList();
+        return jdbcClient.sql("""
+                SELECT links.domain, links.address,
+                       ARRAY(
+                           SELECT tag FROM subscription_tags
+                           WHERE subscription_id = subscriptions.id
+                           ORDER BY position
+                       ) AS tags,
+                       ARRAY(
+                           SELECT expression FROM subscription_filters
+                           WHERE subscription_id = subscriptions.id
+                           ORDER BY position
+                       ) AS filters
+                FROM subscriptions
+                JOIN tracked_links links ON links.id = subscriptions.link_id
+                WHERE subscriptions.user_id = :userId
+                ORDER BY subscriptions.id
+                OFFSET :offset
+                LIMIT :limit
+                """)
+                .param("userId", userId)
+                .param("offset", offset)
+                .param("limit", limit)
+                .query(this::mapSubscription)
+                .list();
+    }
+
+
+    private SubscriptionView mapSubscription(ResultSet resultSet, int rowNumber) throws SQLException {
+        Link link = new Link(
+                resultSet.getString("domain"),
+                resultSet.getString("address")
+        );
+
+        return new SubscriptionView(
+                link,
+                readStrings(resultSet.getArray("tags")),
+                readStrings(resultSet.getArray("filters"))
+        );
+    }
+
+
+    private List<String> readStrings(Array array) throws SQLException {
+        Object[] values = (Object[]) array.getArray();
+
+        return Arrays.stream(values)
+                .map(String::valueOf)
+                .toList();
     }
 }

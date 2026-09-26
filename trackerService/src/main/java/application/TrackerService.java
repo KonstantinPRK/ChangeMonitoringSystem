@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Управляет жизненным циклом сервиса отслеживания.
+ */
 @Component
 public class TrackerService implements SmartLifecycle {
     private final TrackerRegistrationManager registrationManager;

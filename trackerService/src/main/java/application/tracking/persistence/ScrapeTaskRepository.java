@@ -3,32 +3,34 @@ package application.tracking.persistence;
 import application.config.WorkerProperties;
 import application.catalog.model.TrackedResource;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static application.transaction.DatabaseTime.from;
 
+/**
+ * Отвечает за сохранение и чтение данных {@code ScrapeTaskRepository}.
+ */
 @Repository
 public class ScrapeTaskRepository {
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
     private final WorkerProperties workerProperties;
     private final Clock clock;
 
 
     public ScrapeTaskRepository(
-            JdbcTemplate jdbcTemplate,
+            JdbcClient jdbcClient,
             WorkerProperties workerProperties,
             Clock clock
     ) {
-        this.jdbcTemplate = jdbcTemplate;
+        this.jdbcClient = jdbcClient;
         this.workerProperties = workerProperties;
         this.clock = clock;
     }
@@ -37,15 +39,15 @@ public class ScrapeTaskRepository {
     public Optional<TrackedResource> claimNext() {
         Instant now = clock.instant();
         UUID claimToken = UUID.randomUUID();
-        List<TrackedResource> resources = jdbcTemplate.query(
-                """
+
+        return jdbcClient.sql("""
                 UPDATE tracked_resources
-                SET locked_until = ?, claim_token = ?
+                SET locked_until = :lockedUntil, claim_token = :claimToken
                 WHERE id = (
                     SELECT id FROM tracked_resources
                     WHERE active = TRUE
-                      AND next_scrape_at <= ?
-                      AND (locked_until IS NULL OR locked_until <= ?)
+                      AND next_scrape_at <= :now
+                      AND (locked_until IS NULL OR locked_until <= :now)
                     ORDER BY next_scrape_at, id
                     FOR UPDATE SKIP LOCKED
                     LIMIT 1
@@ -53,62 +55,58 @@ public class ScrapeTaskRepository {
                 RETURNING id, subscription_link_id, domain, address, provider_key,
                           resource_kind, remote_resource_key,
                           subscription_revision, failure_count, claim_token
-                """,
-                this::mapResource,
-                from(now.plus(workerProperties.claimLease())),
-                claimToken,
-                from(now),
-                from(now)
-        );
-        return resources.stream().findFirst();
+                """)
+                .param("lockedUntil", from(now.plus(workerProperties.claimLease())))
+                .param("claimToken", claimToken)
+                .param("now", from(now))
+                .query(this::mapResource)
+                .optional();
     }
 
 
     public void complete(TrackedResource resource, Instant nextScrapeAt) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE tracked_resources
-                SET next_scrape_at = ?, failure_count = 0,
-                    last_error = NULL, locked_until = NULL, claim_token = NULL, updated_at = ?
-                WHERE id = ? AND claim_token = ?
-                """,
-                from(nextScrapeAt),
-                from(clock.instant()),
-                resource.id(),
-                resource.claimToken()
-        );
+                SET next_scrape_at = :nextScrapeAt, failure_count = 0,
+                    last_error = NULL, locked_until = NULL, claim_token = NULL, updated_at = :updatedAt
+                WHERE id = :resourceId AND claim_token = :claimToken
+                """)
+                .param("nextScrapeAt", from(nextScrapeAt))
+                .param("updatedAt", from(clock.instant()))
+                .param("resourceId", resource.id())
+                .param("claimToken", resource.claimToken())
+                .update();
     }
 
 
     public void postpone(TrackedResource resource, Instant nextScrapeAt, String error) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE tracked_resources
-                SET next_scrape_at = ?, failure_count = failure_count + 1,
-                    last_error = ?, locked_until = NULL, claim_token = NULL, updated_at = ?
-                WHERE id = ? AND claim_token = ?
-                """,
-                from(nextScrapeAt),
-                error,
-                from(clock.instant()),
-                resource.id(),
-                resource.claimToken()
-        );
+                SET next_scrape_at = :nextScrapeAt, failure_count = failure_count + 1,
+                    last_error = :error, locked_until = NULL, claim_token = NULL, updated_at = :updatedAt
+                WHERE id = :resourceId AND claim_token = :claimToken
+                """)
+                .param("nextScrapeAt", from(nextScrapeAt))
+                .param("error", error)
+                .param("updatedAt", from(clock.instant()))
+                .param("resourceId", resource.id())
+                .param("claimToken", resource.claimToken())
+                .update();
     }
 
 
     public void defer(TrackedResource resource, Instant nextScrapeAt) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE tracked_resources
-                SET next_scrape_at = ?, locked_until = NULL, claim_token = NULL, updated_at = ?
-                WHERE id = ? AND claim_token = ?
-                """,
-                from(nextScrapeAt),
-                from(clock.instant()),
-                resource.id(),
-                resource.claimToken()
-        );
+                SET next_scrape_at = :nextScrapeAt,
+                    locked_until = NULL, claim_token = NULL, updated_at = :updatedAt
+                WHERE id = :resourceId AND claim_token = :claimToken
+                """)
+                .param("nextScrapeAt", from(nextScrapeAt))
+                .param("updatedAt", from(clock.instant()))
+                .param("resourceId", resource.id())
+                .param("claimToken", resource.claimToken())
+                .update();
     }
 
 

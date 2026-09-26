@@ -1,5 +1,8 @@
 package application.vk;
 
+/**
+ * Сигнализирует об ошибке, представленной типом {@code VkApiException}.
+ */
 public class VkApiException extends RuntimeException {
     private final int errorCode;
 

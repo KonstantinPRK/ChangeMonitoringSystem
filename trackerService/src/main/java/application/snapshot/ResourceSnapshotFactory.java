@@ -10,6 +10,9 @@ import java.time.Instant;
 import java.util.HexFormat;
 import java.util.Map;
 
+/**
+ * Создаёт доменные или протокольные объекты через {@code ResourceSnapshotFactory}.
+ */
 @Component
 public class ResourceSnapshotFactory {
     private final ObjectMapper objectMapper;

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Координирует совместную работу компонентов через {@code TrackerManager}.
+ */
 @Service
 public class TrackerManager {
     private final LinkNotificationManager notifications;

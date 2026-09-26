@@ -9,6 +9,9 @@ import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 
+/**
+ * Читает и преобразует входные данные для {@code UpdateEventParser}.
+ */
 @Component
 public class UpdateEventParser {
     private final ObjectReader eventReader;

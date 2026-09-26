@@ -14,6 +14,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Реализует прикладной сценарий {@code LinkSynchronizationService}.
+ */
 @Component
 public class LinkSynchronizationService {
     private static final int PAGE_SIZE = 500;

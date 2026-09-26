@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+/**
+ * Передаёт данные между независимыми частями приложения через {@code SubscriptionDataBridge}.
+ */
 @Component
 public class SubscriptionDataBridge {
     private final SubscriptionOperationRepository operationRepository;

@@ -7,6 +7,9 @@ import application.notification.transport.PublicationStatus;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Завершает обработку и фиксирует её результат через {@code NotificationCompletion}.
+ */
 @Component
 public class NotificationCompletion {
     private final NotificationOutboxRepository outboxRepository;

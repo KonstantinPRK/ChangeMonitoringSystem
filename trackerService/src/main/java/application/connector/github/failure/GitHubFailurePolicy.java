@@ -11,6 +11,9 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 
+/**
+ * Определяет решение после ошибки через {@code GitHubFailurePolicy}.
+ */
 @Component
 public class GitHubFailurePolicy implements ProviderFailurePolicy {
     private final RetryBackoff retryBackoff;

@@ -3,6 +3,9 @@ package application.interaction;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Передаёт между компонентами данные {@code ConversationSession}.
+ */
 public record ConversationSession(
         UUID userId,
         ConversationState state,

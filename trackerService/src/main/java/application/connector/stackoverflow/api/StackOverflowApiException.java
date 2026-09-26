@@ -2,6 +2,9 @@ package application.connector.stackoverflow.api;
 
 import java.time.Instant;
 
+/**
+ * Сигнализирует об ошибке, представленной типом {@code StackOverflowApiException}.
+ */
 public class StackOverflowApiException extends RuntimeException {
     private final int statusCode;
     private final Instant retryAt;

@@ -11,6 +11,9 @@ import application.user.UserManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Координирует совместную работу компонентов через {@code NotificationManager}.
+ */
 @Service
 public class NotificationManager {
     private static final int RECIPIENT_BATCH_SIZE = 500;

@@ -3,6 +3,9 @@ package application.work;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Гарантирует, что для одной очереди одновременно выполняется не более одного асинхронного цикла.
+ */
 public final class SerializedWorker {
     private final Executor executor;
     private final AsynchronousWork work;

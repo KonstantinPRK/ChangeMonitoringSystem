@@ -6,6 +6,9 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 
+/**
+ * Реализует ответственность компонента {@code RetryBackoff}.
+ */
 @Component
 public class RetryBackoff {
     private final Clock clock;

@@ -12,6 +12,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Читает и преобразует входные данные для {@code VkUpdateParser}.
+ */
 @Component
 public class VkUpdateParser {
     private static final String INCOMING_MESSAGE_EVENT = "message_new";

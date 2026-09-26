@@ -4,6 +4,9 @@ import application.subscription.model.Link;
 
 import java.util.List;
 
+/**
+ * Передаёт между компонентами данные {@code SubscriptionOperationDraft}.
+ */
 public record SubscriptionOperationDraft(
         SubscriptionOperationType type,
         Link link,

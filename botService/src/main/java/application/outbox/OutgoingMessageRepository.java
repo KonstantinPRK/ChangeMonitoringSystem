@@ -1,6 +1,6 @@
 package application.outbox;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -8,61 +8,64 @@ import java.sql.SQLException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static application.persistence.DatabaseTime.from;
 
+/**
+ * Отвечает за сохранение и чтение данных {@code OutgoingMessageRepository}.
+ */
 @Repository
 public class OutgoingMessageRepository {
     private static final Duration CLAIM_LEASE = Duration.ofSeconds(60);
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
     private final Clock clock;
 
 
-    public OutgoingMessageRepository(JdbcTemplate jdbcTemplate, Clock clock) {
-        this.jdbcTemplate = jdbcTemplate;
+    public OutgoingMessageRepository(JdbcClient jdbcClient, Clock clock) {
+        this.jdbcClient = jdbcClient;
         this.clock = clock;
     }
 
 
     public void save(String deduplicationKey, UUID userId, String chatId, String text) {
-        jdbcTemplate.update(
-                """
+        Instant now = clock.instant();
+
+        jdbcClient.sql("""
                 INSERT INTO outgoing_messages (
                     id, deduplication_key, user_id, chat_id, text,
                     status, available_at, created_at
-                ) VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?)
+                ) VALUES (:id, :deduplicationKey, :userId, :chatId, :text, 'PENDING', :availableAt, :createdAt)
                 ON CONFLICT (deduplication_key) DO NOTHING
-                """,
-                UUID.randomUUID(),
-                deduplicationKey,
-                userId,
-                chatId,
-                text,
-                from(clock.instant()),
-                from(clock.instant())
-        );
+                """)
+                .param("id", UUID.randomUUID())
+                .param("deduplicationKey", deduplicationKey)
+                .param("userId", userId)
+                .param("chatId", chatId)
+                .param("text", text)
+                .param("availableAt", from(now))
+                .param("createdAt", from(now))
+                .update();
     }
 
 
     public Optional<StoredOutgoingMessage> claimNext(String botId) {
         Instant now = clock.instant();
         UUID claimToken = UUID.randomUUID();
-        List<StoredOutgoingMessage> messages = jdbcTemplate.query(
-                """
+
+        return jdbcClient.sql("""
                 UPDATE outgoing_messages AS outgoing
                 SET status = 'PROCESSING', attempts = attempts + 1,
-                    locked_until = ?, claim_token = ?
+                    locked_until = :lockedUntil, claim_token = :claimToken
                 WHERE outgoing.id = (
                     SELECT candidate.id
                     FROM outgoing_messages AS candidate
                     JOIN bot_users AS users ON users.id = candidate.user_id
-                    WHERE users.bot_id = ?
+                    WHERE users.bot_id = :botId
                       AND (
-                          (candidate.status IN ('PENDING', 'RETRY') AND candidate.available_at <= ?)
-                          OR (candidate.status = 'PROCESSING' AND candidate.locked_until <= ?)
+                          (candidate.status IN ('PENDING', 'RETRY') AND candidate.available_at <= :now)
+                          OR (candidate.status = 'PROCESSING' AND candidate.locked_until <= :now)
                       )
                     ORDER BY candidate.created_at
                     FOR UPDATE OF candidate SKIP LOCKED
@@ -70,60 +73,55 @@ public class OutgoingMessageRepository {
                 )
                 RETURNING outgoing.id, outgoing.chat_id, outgoing.text,
                           outgoing.attempts, outgoing.claim_token
-                """,
-                (resultSet, rowNumber) -> mapMessage(resultSet, rowNumber, botId),
-                from(now.plus(CLAIM_LEASE)),
-                claimToken,
-                botId,
-                from(now),
-                from(now)
-        );
-        return messages.stream().findFirst();
+                """)
+                .param("lockedUntil", from(now.plus(CLAIM_LEASE)))
+                .param("claimToken", claimToken)
+                .param("botId", botId)
+                .param("now", from(now))
+                .query((resultSet, rowNumber) -> mapMessage(resultSet, rowNumber, botId))
+                .optional();
     }
 
 
     public void complete(StoredOutgoingMessage message, String messengerMessageId) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE outgoing_messages
-                SET status = 'COMPLETED', messenger_message_id = ?,
+                SET status = 'COMPLETED', messenger_message_id = :messengerMessageId,
                     locked_until = NULL, claim_token = NULL
-                WHERE id = ? AND claim_token = ?
-                """,
-                messengerMessageId,
-                message.id(),
-                message.claimToken()
-        );
+                WHERE id = :id AND claim_token = :claimToken
+                """)
+                .param("messengerMessageId", messengerMessageId)
+                .param("id", message.id())
+                .param("claimToken", message.claimToken())
+                .update();
     }
 
 
     public void retry(StoredOutgoingMessage message, Duration delay, String error) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE outgoing_messages
-                SET status = 'RETRY', available_at = ?, last_error = ?,
+                SET status = 'RETRY', available_at = :availableAt, last_error = :error,
                     locked_until = NULL, claim_token = NULL
-                WHERE id = ? AND claim_token = ?
-                """,
-                from(clock.instant().plus(delay)),
-                error,
-                message.id(),
-                message.claimToken()
-        );
+                WHERE id = :id AND claim_token = :claimToken
+                """)
+                .param("availableAt", from(clock.instant().plus(delay)))
+                .param("error", error)
+                .param("id", message.id())
+                .param("claimToken", message.claimToken())
+                .update();
     }
 
 
     public void fail(StoredOutgoingMessage message, String error) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE outgoing_messages
-                SET status = 'FAILED', last_error = ?, locked_until = NULL, claim_token = NULL
-                WHERE id = ? AND claim_token = ?
-                """,
-                error,
-                message.id(),
-                message.claimToken()
-        );
+                SET status = 'FAILED', last_error = :error, locked_until = NULL, claim_token = NULL
+                WHERE id = :id AND claim_token = :claimToken
+                """)
+                .param("error", error)
+                .param("id", message.id())
+                .param("claimToken", message.claimToken())
+                .update();
     }
 
 

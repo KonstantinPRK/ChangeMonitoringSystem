@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.listener.ConsumerRecordRecoverer;
 import org.springframework.stereotype.Component;
 
+/**
+ * Реализует ответственность компонента {@code InvalidUpdateRecoverer}.
+ */
 @Component
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "KAFKA")
 public class InvalidUpdateRecoverer implements ConsumerRecordRecoverer {

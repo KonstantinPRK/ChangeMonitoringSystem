@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Реализует ответственность компонента {@code TrackerLinkApi}.
+ */
 @RestController
 @Validated
 public class TrackerLinkApi {

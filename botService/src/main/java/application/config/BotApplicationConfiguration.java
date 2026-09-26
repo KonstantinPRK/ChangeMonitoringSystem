@@ -14,6 +14,9 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.concurrent.Executor;
 
+/**
+ * Создаёт и связывает Spring-компоненты для {@code BotApplicationConfiguration}.
+ */
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = "application")
 @EnableConfigurationProperties({

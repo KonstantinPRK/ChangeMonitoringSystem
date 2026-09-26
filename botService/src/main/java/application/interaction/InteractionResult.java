@@ -4,6 +4,9 @@ import application.subscription.operation.SubscriptionOperationDraft;
 
 import java.util.List;
 
+/**
+ * Передаёт между компонентами данные {@code InteractionResult}.
+ */
 public record InteractionResult(
         ConversationSession session,
         List<String> replies,

@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет прикладную операцию через {@code DeleteAccountExecutor}.
+ */
 @Component
 public class DeleteAccountExecutor implements SubscriptionOperationExecutor {
     private final RemoveAllSubscriptions removeAllSubscriptions;

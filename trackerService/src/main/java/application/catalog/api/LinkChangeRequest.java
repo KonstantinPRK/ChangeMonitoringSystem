@@ -8,6 +8,9 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.UUID;
 
+/**
+ * Передаёт между компонентами данные {@code LinkChangeRequest}.
+ */
 public record LinkChangeRequest(
         @NotNull UUID requestId,
         @NotNull LinkRequestAction actionType,

@@ -8,6 +8,9 @@ import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Передаёт между компонентами данные {@code LinkNotification}.
+ */
 public record LinkNotification(
         @NotNull UUID eventId,
         @NotBlank @Size(max = 128) String trackerId,

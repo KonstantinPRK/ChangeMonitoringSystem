@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Регистрирует и обновляет метрики компонента {@code ScrapeMetrics}.
+ */
 @Component
 public class ScrapeMetrics {
     private final MeterRegistry meterRegistry;

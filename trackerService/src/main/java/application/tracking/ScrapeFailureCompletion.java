@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletionException;
 
+/**
+ * Завершает обработку и фиксирует её результат через {@code ScrapeFailureCompletion}.
+ */
 @Component
 public class ScrapeFailureCompletion {
     private final ScrapeTaskRepository scrapeTaskRepository;

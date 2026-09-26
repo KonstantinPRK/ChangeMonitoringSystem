@@ -11,6 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Формирует запросы внешнего протокола для {@code SubscriptionRequestFactory}.
+ */
 @Component
 public class SubscriptionRequestFactory {
     public SubscriptionRequest create(

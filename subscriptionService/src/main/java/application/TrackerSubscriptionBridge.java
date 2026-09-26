@@ -12,6 +12,9 @@ import application.tracker.TrackerClient;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/**
+ * Передаёт данные между независимыми частями приложения через {@code TrackerSubscriptionBridge}.
+ */
 @Component
 public class TrackerSubscriptionBridge {
     private final ExchangeDataChannel exchange;

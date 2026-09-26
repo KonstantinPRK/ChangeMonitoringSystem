@@ -7,6 +7,9 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.Instant;
 
+/**
+ * Читает и преобразует входные данные для {@code GitHubHeaderReader}.
+ */
 @Component
 public class GitHubHeaderReader {
     public GitHubHttpResponse read(HttpResponse<String> response) {

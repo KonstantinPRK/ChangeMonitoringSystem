@@ -57,7 +57,7 @@
   ],
   "refresh": "10s",
   "schemaVersion": 41,
-  "tags": ["tracker", "github", "stackoverflow"],
+  "tags": ["ChangeMonitoringSystem", "tracker-service"],
   "templating": {
     "list": [
       {

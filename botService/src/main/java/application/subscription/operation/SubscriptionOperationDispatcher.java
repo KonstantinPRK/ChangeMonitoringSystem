@@ -14,6 +14,9 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Передаёт ожидающие задачи подходящим обработчикам через {@code SubscriptionOperationDispatcher}.
+ */
 @Component
 public class SubscriptionOperationDispatcher {
     private final SubscriptionOperationRepository operationRepository;

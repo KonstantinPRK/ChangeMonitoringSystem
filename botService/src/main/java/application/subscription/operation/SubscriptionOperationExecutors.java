@@ -6,6 +6,9 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Реализует ответственность компонента {@code SubscriptionOperationExecutors}.
+ */
 @Component
 public class SubscriptionOperationExecutors {
     private final Map<SubscriptionOperationType, SubscriptionOperationExecutor> executors =

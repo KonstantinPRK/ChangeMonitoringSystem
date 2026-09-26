@@ -11,6 +11,9 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Читает и преобразует входные данные для {@code GitHubSnapshotReader}.
+ */
 @Component
 public class GitHubSnapshotReader {
     private final ResourceSnapshotFactory snapshotFactory;

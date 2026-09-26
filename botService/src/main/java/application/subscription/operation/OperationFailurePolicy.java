@@ -6,6 +6,9 @@ import application.subscription.api.SubscriptionRequestFailedException;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Определяет решение после ошибки через {@code OperationFailurePolicy}.
+ */
 @Component
 public class OperationFailurePolicy {
     private final WorkerProperties workerProperties;

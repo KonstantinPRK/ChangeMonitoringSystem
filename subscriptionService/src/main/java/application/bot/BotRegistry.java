@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Хранит и находит зарегистрированные компоненты через {@code BotRegistry}.
+ */
 @Component
 public class BotRegistry {
     private final Map<String, BotInstance> botsById = new HashMap<>();

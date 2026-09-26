@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+/**
+ * Хранит ожидающие обработки элементы в {@code LinkRequestQueue}.
+ */
 @Component
 public class LinkRequestQueue {
     private final QueueStore queue;

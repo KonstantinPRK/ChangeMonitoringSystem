@@ -3,6 +3,9 @@ package application.config;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
+/**
+ * Читает и преобразует входные данные для {@code JsonCodec}.
+ */
 @Component
 public class JsonCodec {
     private final ObjectMapper mapper;

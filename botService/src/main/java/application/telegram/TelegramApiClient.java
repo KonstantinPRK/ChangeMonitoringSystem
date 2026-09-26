@@ -14,6 +14,9 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет HTTP-запросы к удалённому сервису для {@code TelegramApiClient}.
+ */
 @Component
 public class TelegramApiClient {
     private static final URI API_BASE_URL = URI.create("https://api.telegram.org/");

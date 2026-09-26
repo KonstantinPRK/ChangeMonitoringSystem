@@ -4,6 +4,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Описывает сигнал для пробуждения обработчика {@code NotificationWorkSignal}.
+ */
 @Component
 public class NotificationWorkSignal {
     private final AtomicReference<Runnable> listener = new AtomicReference<>(() -> { });

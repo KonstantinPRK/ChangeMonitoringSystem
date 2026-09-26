@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
+/**
+ * Определяет решение после ошибки через {@code OutgoingMessageFailurePolicy}.
+ */
 @Component
 public class OutgoingMessageFailurePolicy {
     private static final Duration MAXIMUM_RETRY_DELAY = Duration.ofMinutes(2);

@@ -11,6 +11,9 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 
+/**
+ * Определяет решение после ошибки через {@code StackOverflowFailurePolicy}.
+ */
 @Component
 public class StackOverflowFailurePolicy implements ProviderFailurePolicy {
     private final RetryBackoff retryBackoff;

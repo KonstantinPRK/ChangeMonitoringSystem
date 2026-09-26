@@ -13,6 +13,9 @@ import java.util.HexFormat;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Кэширует данные, используемые компонентом {@code StackOverflowQuotaCache}.
+ */
 @Component
 public class StackOverflowQuotaCache {
     private static final Duration TIME_TO_LIVE = Duration.ofDays(1);

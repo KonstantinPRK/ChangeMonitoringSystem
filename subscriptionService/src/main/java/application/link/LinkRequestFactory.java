@@ -4,6 +4,9 @@ import application.subscriptions.SubscriptionRequest;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Формирует запросы внешнего протокола для {@code LinkRequestFactory}.
+ */
 @Component
 public class LinkRequestFactory {
 

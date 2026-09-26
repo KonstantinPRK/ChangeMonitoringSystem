@@ -10,6 +10,9 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * Проверяет корректность данных для {@code RegistrationValidator}.
+ */
 @Component
 public class RegistrationValidator {
     public String identifier(String identifier) {

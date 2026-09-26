@@ -6,6 +6,9 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
 
+/**
+ * Реализует ответственность компонента {@code GitHubRateLimitGate}.
+ */
 @Component
 public class GitHubRateLimitGate {
     private final GitHubRateLimitCache rateLimitCache;

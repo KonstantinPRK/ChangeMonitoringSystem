@@ -3,23 +3,27 @@ package application.catalog.persistence;
 import application.catalog.model.ResolvedResource;
 import application.catalog.model.TrackedLink;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.Instant;
 import java.util.UUID;
 
 import static application.transaction.DatabaseTime.from;
 
+/**
+ * Отвечает за сохранение и чтение данных {@code LinkCatalogRepository}.
+ */
 @Repository
 public class LinkCatalogRepository {
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
     private final Clock clock;
 
 
-    public LinkCatalogRepository(JdbcTemplate jdbcTemplate, Clock clock) {
-        this.jdbcTemplate = jdbcTemplate;
+    public LinkCatalogRepository(JdbcClient jdbcClient, Clock clock) {
+        this.jdbcClient = jdbcClient;
         this.clock = clock;
     }
 
@@ -27,13 +31,18 @@ public class LinkCatalogRepository {
     @Transactional
     public void save(UUID generation, TrackedLink link, ResolvedResource resource) {
         deleteObsoleteSnapshot(link, resource);
-        jdbcTemplate.update(
-                """
+
+        Instant now = clock.instant();
+        jdbcClient.sql("""
                 INSERT INTO tracked_resources (
                     subscription_link_id, domain, address, canonical_url, provider_key,
                     resource_kind, remote_resource_key, subscription_revision, active,
                     synchronization_generation, next_scrape_at, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE, ?, ?, ?, ?)
+                ) VALUES (
+                    :subscriptionLinkId, :domain, :address, :canonicalUrl, :providerKey,
+                    :resourceKind, :remoteResourceKey, :revision, TRUE,
+                    :generation, :nextScrapeAt, :createdAt, :updatedAt
+                )
                 ON CONFLICT (subscription_link_id) DO UPDATE SET
                     domain = EXCLUDED.domain,
                     address = EXCLUDED.address,
@@ -45,69 +54,67 @@ public class LinkCatalogRepository {
                     active = TRUE,
                     synchronization_generation = EXCLUDED.synchronization_generation,
                     updated_at = EXCLUDED.updated_at
-                """,
-                link.id(),
-                link.link().domain(),
-                link.link().address(),
-                resource.canonicalUrl(),
-                resource.providerKey(),
-                resource.resourceKind(),
-                resource.remoteResourceKey(),
-                link.revision(),
-                generation,
-                from(clock.instant()),
-                from(clock.instant()),
-                from(clock.instant())
-        );
+                """)
+                .param("subscriptionLinkId", link.id())
+                .param("domain", link.link().domain())
+                .param("address", link.link().address())
+                .param("canonicalUrl", resource.canonicalUrl())
+                .param("providerKey", resource.providerKey())
+                .param("resourceKind", resource.resourceKind())
+                .param("remoteResourceKey", resource.remoteResourceKey())
+                .param("revision", link.revision())
+                .param("generation", generation)
+                .param("nextScrapeAt", from(now))
+                .param("createdAt", from(now))
+                .param("updatedAt", from(now))
+                .update();
     }
 
 
     public void deactivateMissing(UUID generation) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 UPDATE tracked_resources
-                SET active = FALSE, locked_until = NULL, claim_token = NULL, updated_at = ?
-                WHERE active = TRUE AND synchronization_generation <> ?
-                """,
-                from(clock.instant()),
-                generation
-        );
+                SET active = FALSE, locked_until = NULL, claim_token = NULL, updated_at = :updatedAt
+                WHERE active = TRUE AND synchronization_generation <> :generation
+                """)
+                .param("updatedAt", from(clock.instant()))
+                .param("generation", generation)
+                .update();
     }
 
 
     public long countActive(String providerKey, String resourceKind) {
-        Long count = jdbcTemplate.queryForObject(
-                """
+        return jdbcClient.sql("""
                 SELECT COUNT(*) FROM tracked_resources
-                WHERE active = TRUE AND provider_key = ? AND resource_kind = ?
-                """,
-                Long.class,
-                providerKey,
-                resourceKind
-        );
-        return count == null ? 0L : count;
+                WHERE active = TRUE
+                  AND provider_key = :providerKey
+                  AND resource_kind = :resourceKind
+                """)
+                .param("providerKey", providerKey)
+                .param("resourceKind", resourceKind)
+                .query(Long.class)
+                .single();
     }
 
 
     private void deleteObsoleteSnapshot(TrackedLink link, ResolvedResource resource) {
-        jdbcTemplate.update(
-                """
+        jdbcClient.sql("""
                 DELETE FROM resource_snapshots snapshot
                 USING tracked_resources tracked
                 WHERE snapshot.tracked_resource_id = tracked.id
-                  AND tracked.subscription_link_id = ?
-                  AND (tracked.address IS DISTINCT FROM ?
-                    OR tracked.canonical_url IS DISTINCT FROM ?
-                    OR tracked.provider_key IS DISTINCT FROM ?
-                    OR tracked.resource_kind IS DISTINCT FROM ?
-                    OR tracked.remote_resource_key IS DISTINCT FROM ?)
-                """,
-                link.id(),
-                link.link().address(),
-                resource.canonicalUrl(),
-                resource.providerKey(),
-                resource.resourceKind(),
-                resource.remoteResourceKey()
-        );
+                  AND tracked.subscription_link_id = :subscriptionLinkId
+                  AND (tracked.address IS DISTINCT FROM :address
+                    OR tracked.canonical_url IS DISTINCT FROM :canonicalUrl
+                    OR tracked.provider_key IS DISTINCT FROM :providerKey
+                    OR tracked.resource_kind IS DISTINCT FROM :resourceKind
+                    OR tracked.remote_resource_key IS DISTINCT FROM :remoteResourceKey)
+                """)
+                .param("subscriptionLinkId", link.id())
+                .param("address", link.link().address())
+                .param("canonicalUrl", resource.canonicalUrl())
+                .param("providerKey", resource.providerKey())
+                .param("resourceKind", resource.resourceKind())
+                .param("remoteResourceKey", resource.remoteResourceKey())
+                .update();
     }
 }

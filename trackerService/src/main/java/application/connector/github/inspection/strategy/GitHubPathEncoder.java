@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Реализует ответственность компонента {@code GitHubPathEncoder}.
+ */
 @Component
 public class GitHubPathEncoder {
     public String encode(String segment) {

@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CountDownLatch;
 
+/**
+ * Управляет жизненным циклом сервиса подписок.
+ */
 @Component
 public class SubscriptionService implements SmartLifecycle {
     private final QueueProcessor processor;

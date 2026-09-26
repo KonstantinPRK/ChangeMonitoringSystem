@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 
+/**
+ * Создаёт и связывает Spring-компоненты для {@code TrackerKafkaConfiguration}.
+ */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "KAFKA")
 public class TrackerKafkaConfiguration {

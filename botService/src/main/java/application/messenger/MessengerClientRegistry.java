@@ -7,6 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Хранит и находит зарегистрированные компоненты через {@code MessengerClientRegistry}.
+ */
 @Component
 public class MessengerClientRegistry {
     private final Map<String, MessengerClient> clientsByBotId;

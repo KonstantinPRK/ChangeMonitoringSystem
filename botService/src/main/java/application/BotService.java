@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Управляет жизненным циклом сервиса ботов.
+ */
 @Component
 public class BotService implements SmartLifecycle {
     private final MessengerDataBridge messengerDataBridge;

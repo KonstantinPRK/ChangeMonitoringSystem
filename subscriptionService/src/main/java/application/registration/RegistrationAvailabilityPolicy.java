@@ -7,6 +7,9 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 
+/**
+ * Определяет решение после ошибки через {@code RegistrationAvailabilityPolicy}.
+ */
 public class RegistrationAvailabilityPolicy {
     private final Clock clock;
     private final Duration availabilityTimeout;

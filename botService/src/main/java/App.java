@@ -2,6 +2,9 @@ import application.config.BotApplicationConfiguration;
 
 import org.springframework.boot.SpringApplication;
 
+/**
+ * Запускает приложение и передаёт управление контейнеру Spring.
+ */
 public final class App {
     private App() {
     }

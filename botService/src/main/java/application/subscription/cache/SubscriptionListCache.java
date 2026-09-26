@@ -16,6 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Кэширует данные, используемые компонентом {@code SubscriptionListCache}.
+ */
 @Component
 public class SubscriptionListCache {
     private final StringRedisTemplate redisTemplate;

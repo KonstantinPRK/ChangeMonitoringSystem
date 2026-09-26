@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Получает состояние удалённого ресурса через {@code StackOverflowInspector}.
+ */
 @Component
 public class StackOverflowInspector implements ResourceInspector {
     private final StackOverflowApiClient apiClient;

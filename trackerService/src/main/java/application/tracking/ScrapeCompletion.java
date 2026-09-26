@@ -17,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.util.Optional;
 
+/**
+ * Завершает обработку и фиксирует её результат через {@code ScrapeCompletion}.
+ */
 @Component
 public class ScrapeCompletion {
     private final SnapshotRepository snapshotRepository;

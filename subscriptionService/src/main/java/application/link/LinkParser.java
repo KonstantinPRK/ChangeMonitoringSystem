@@ -6,6 +6,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 
+/**
+ * Читает и преобразует входные данные для {@code LinkParser}.
+ */
 @Component
 public class LinkParser {
     private static final int MAXIMUM_ADDRESS_LENGTH = 2048;

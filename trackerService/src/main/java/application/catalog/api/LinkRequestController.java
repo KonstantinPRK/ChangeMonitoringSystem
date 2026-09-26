@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Предоставляет HTTP-эндпоинты компонента {@code LinkRequestController}.
+ */
 @RestController
 @RequestMapping("/api/v1/links/requests")
 public class LinkRequestController {

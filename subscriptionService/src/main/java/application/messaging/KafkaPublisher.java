@@ -10,6 +10,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Публикует данные во внешний транспорт через {@code KafkaPublisher}.
+ */
 @Component
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "KAFKA")
 public class KafkaPublisher {

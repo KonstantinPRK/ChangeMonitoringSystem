@@ -15,6 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Хранит и извлекает данные {@code UserDatabase}.
+ */
 @Repository
 public class UserDatabase {
     private final UserRepository userRepository;
@@ -57,26 +60,23 @@ public class UserDatabase {
         LinkEntity storedLink = linkRepository.createAndLock(link);
         UserEntity storedUser = userRepository.createAndLock(user);
         Optional<SubscriptionEntity> existingSubscription =
-            subscriptionRepository.find(
-                storedUser.getId(),
-                storedLink.getId()
-            );
+                subscriptionRepository.find(storedUser, storedLink);
 
         if (existingSubscription.isPresent()) {
             return updateSubscriptionMetadata(
-                existingSubscription.get(),
-                storedUser,
-                storedLink,
-                tags,
-                filters
+                    existingSubscription.get(),
+                    storedUser,
+                    storedLink,
+                    tags,
+                    filters
             );
         }
 
         return createSubscription(
-            storedUser,
-            storedLink,
-            tags,
-            filters
+                storedUser,
+                storedLink,
+                tags,
+                filters
         );
     }
 
@@ -88,9 +88,12 @@ public class UserDatabase {
         List<String> tags,
         List<String> filters
     ) {
-        boolean metadataChanged = subscription.replaceMetadata(tags, filters);
+        boolean metadataChanged = !subscription.hasMetadata(tags, filters);
 
-        if (metadataChanged) user.advanceSubscriptionsRevision();
+        if (metadataChanged) {
+            subscriptionRepository.replaceMetadata(subscription.getId(), tags, filters);
+            userRepository.advanceSubscriptionsRevision(user.getId());
+        }
 
         return new SubscriptionChange(
             metadataChanged,
@@ -107,20 +110,19 @@ public class UserDatabase {
         List<String> filters
     ) {
         boolean firstSubscriber =
-            subscriptionRepository.countByLink(link.getId()) == 0;
+                subscriptionRepository.countByLink(link.getId()) == 0;
 
-        subscriptionRepository.save(
-            new SubscriptionEntity(user, link, tags, filters)
-        );
+        subscriptionRepository.create(user, link, tags, filters);
+        userRepository.advanceSubscriptionsRevision(user.getId());
 
-        user.advanceSubscriptionsRevision();
-
-        if (firstSubscriber) link.advanceTrackingRevision();
+        long trackingRevision = firstSubscriber
+                ? linkRepository.advanceTrackingRevision(link.getId())
+                : link.getTrackingRevision();
 
         return new SubscriptionChange(
-            true,
-            firstSubscriber,
-            link.getTrackingRevision()
+                true,
+                firstSubscriber,
+                trackingRevision
         );
     }
 
@@ -140,19 +142,16 @@ public class UserDatabase {
 
         UserEntity lockedUser = storedUser.get();
         Optional<SubscriptionEntity> storedSubscription =
-            subscriptionRepository.find(
-                lockedUser.getId(),
-                lockedLink.getId()
-            );
+                subscriptionRepository.find(lockedUser, lockedLink);
 
         if (storedSubscription.isEmpty()) {
             return unchangedSubscription(currentTrackingRevision);
         }
 
         return deleteStoredSubscription(
-            storedSubscription.get(),
-            lockedUser,
-            lockedLink
+                storedSubscription.get(),
+                lockedUser,
+                lockedLink
         );
     }
 
@@ -163,26 +162,28 @@ public class UserDatabase {
         LinkEntity link
     ) {
         boolean lastSubscriber =
-            subscriptionRepository.countByLink(link.getId()) == 1;
+                subscriptionRepository.countByLink(link.getId()) == 1;
 
         subscriptionRepository.delete(subscription);
-        user.advanceSubscriptionsRevision();
+        userRepository.advanceSubscriptionsRevision(user.getId());
 
-        if (lastSubscriber) link.advanceTrackingRevision();
+        long trackingRevision = lastSubscriber
+                ? linkRepository.advanceTrackingRevision(link.getId())
+                : link.getTrackingRevision();
 
         return new SubscriptionChange(
-            true,
-            lastSubscriber,
-            link.getTrackingRevision()
+                true,
+                lastSubscriber,
+                trackingRevision
         );
     }
 
 
     private SubscriptionChange unchangedSubscription(long trackingRevision) {
         return new SubscriptionChange(
-            false,
-            false,
-            trackingRevision
+                false,
+                false,
+                trackingRevision
         );
     }
 }

@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Регистрирует и обновляет метрики компонента {@code ActiveResourceMetrics}.
+ */
 @Component
 public class ActiveResourceMetrics {
     private final LinkCatalogRepository linkCatalogRepository;

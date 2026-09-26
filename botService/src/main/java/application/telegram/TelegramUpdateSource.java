@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Получает входные данные из внешнего источника через {@code TelegramUpdateSource}.
+ */
 @Component
 public class TelegramUpdateSource implements MessageUpdateSource {
     private final TelegramApiClient apiClient;

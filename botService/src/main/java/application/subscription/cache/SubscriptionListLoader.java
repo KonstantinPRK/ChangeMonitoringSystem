@@ -12,6 +12,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Реализует ответственность компонента {@code SubscriptionListLoader}.
+ */
 @Component
 public class SubscriptionListLoader {
     private static final int PAGE_SIZE = 500;

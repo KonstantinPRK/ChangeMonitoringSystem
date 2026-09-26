@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Получает состояние удалённого ресурса через {@code RepositoryInspector}.
+ */
 @Component
 public class RepositoryInspector implements GitHubResourceInspector {
     private final GitHubApiClient apiClient;

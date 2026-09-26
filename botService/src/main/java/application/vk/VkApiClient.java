@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет HTTP-запросы к удалённому сервису для {@code VkApiClient}.
+ */
 @Component
 public class VkApiClient {
     private static final URI API_BASE_URL = URI.create("https://api.vk.com/method/");

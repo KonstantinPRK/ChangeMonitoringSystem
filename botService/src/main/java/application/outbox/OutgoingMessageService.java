@@ -6,6 +6,9 @@ import application.work.OutgoingWorkSignal;
 
 import org.springframework.stereotype.Service;
 
+/**
+ * Реализует прикладной сценарий {@code OutgoingMessageService}.
+ */
 @Service
 public class OutgoingMessageService {
     private final OutgoingMessageRepository messageRepository;

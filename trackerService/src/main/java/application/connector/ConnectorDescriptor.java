@@ -3,6 +3,9 @@ package application.connector;
 import java.time.Duration;
 import java.util.Set;
 
+/**
+ * Передаёт между компонентами данные {@code ConnectorDescriptor}.
+ */
 public record ConnectorDescriptor(
         String key,
         Set<String> supportedHosts,

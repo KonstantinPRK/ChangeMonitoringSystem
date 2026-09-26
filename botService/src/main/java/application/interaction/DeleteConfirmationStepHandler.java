@@ -6,6 +6,9 @@ import application.user.BotUser;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Обрабатывает один сценарий через {@code DeleteConfirmationStepHandler}.
+ */
 @Component
 public class DeleteConfirmationStepHandler implements ConversationStepHandler {
     @Override

@@ -4,6 +4,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+/**
+ * Запускает действие только после успешной фиксации текущей транзакции.
+ */
 @Component
 public class AfterCommitAction {
     public void execute(Runnable action) {

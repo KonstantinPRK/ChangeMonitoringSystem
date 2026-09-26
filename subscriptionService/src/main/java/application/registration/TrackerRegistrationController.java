@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Предоставляет HTTP-эндпоинты компонента {@code TrackerRegistrationController}.
+ */
 @RestController
 @RequestMapping("/internal/trackers")
 public class TrackerRegistrationController {

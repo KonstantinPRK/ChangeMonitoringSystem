@@ -5,6 +5,9 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Обрабатывает один сценарий через {@code NotificationExceptionHandler}.
+ */
 @RestControllerAdvice
 public class NotificationExceptionHandler {
     @ExceptionHandler(InvalidNotificationException.class)

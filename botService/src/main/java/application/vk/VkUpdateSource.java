@@ -17,6 +17,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Получает входные данные из внешнего источника через {@code VkUpdateSource}.
+ */
 @Component
 public class VkUpdateSource implements MessageUpdateSource {
     private final VkApiClient apiClient;

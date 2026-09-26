@@ -14,6 +14,9 @@ import java.util.HexFormat;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Кэширует данные, используемые компонентом {@code GitHubRateLimitCache}.
+ */
 @Component
 public class GitHubRateLimitCache {
     private final StringRedisTemplate redisTemplate;

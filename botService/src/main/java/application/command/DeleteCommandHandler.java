@@ -7,6 +7,9 @@ import application.user.BotUser;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Обрабатывает один сценарий через {@code DeleteCommandHandler}.
+ */
 @Component
 public class DeleteCommandHandler implements CommandHandler {
     @Override

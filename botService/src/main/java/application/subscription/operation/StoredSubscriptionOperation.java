@@ -6,6 +6,9 @@ import application.user.BotUser;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Передаёт между компонентами данные {@code StoredSubscriptionOperation}.
+ */
 public record StoredSubscriptionOperation(
         UUID id,
         SubscriptionOperationType type,

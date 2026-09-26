@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Публикует данные во внешний транспорт через {@code KafkaLinkNotificationPublisher}.
+ */
 @Component
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "KAFKA")
 public class KafkaLinkNotificationPublisher implements LinkNotificationPublisher {

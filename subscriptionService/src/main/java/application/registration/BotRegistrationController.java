@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Предоставляет HTTP-эндпоинты компонента {@code BotRegistrationController}.
+ */
 @RestController
 @RequestMapping("/internal/bots")
 public class BotRegistrationController {

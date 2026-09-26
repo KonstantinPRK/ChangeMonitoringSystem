@@ -20,6 +20,9 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Передаёт ожидающие задачи подходящим обработчикам через {@code ScrapeDispatcher}.
+ */
 @Component
 public class ScrapeDispatcher {
     private final ScrapeTaskRepository scrapeTaskRepository;

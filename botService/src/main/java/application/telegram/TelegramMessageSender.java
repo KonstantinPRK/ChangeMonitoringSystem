@@ -14,6 +14,9 @@ import java.util.Map;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Отправляет данные во внешний транспорт через {@code TelegramMessageSender}.
+ */
 @Component
 public class TelegramMessageSender implements MessageSender {
     private final TelegramApiClient apiClient;

@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * Предоставляет HTTP-эндпоинты компонента {@code TrackerClientApi}.
+ */
 @RestController
 @RequestMapping("/api/v1/updates")
 public class TrackerClientApi {

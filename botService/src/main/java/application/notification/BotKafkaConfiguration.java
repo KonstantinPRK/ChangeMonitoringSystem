@@ -11,6 +11,9 @@ import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.util.backoff.FixedBackOff;
 
+/**
+ * Создаёт и связывает Spring-компоненты для {@code BotKafkaConfiguration}.
+ */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "KAFKA")
 public class BotKafkaConfiguration {

@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Реализует ответственность компонента {@code RemoveAllSubscriptions}.
+ */
 @Component
 public class RemoveAllSubscriptions {
     private final SubscriptionServiceApiClient apiClient;

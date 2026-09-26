@@ -4,6 +4,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
+/**
+ * Читает и преобразует входные данные для {@code CommandParser}.
+ */
 @Component
 public class CommandParser {
     public CommandType parse(String text) {

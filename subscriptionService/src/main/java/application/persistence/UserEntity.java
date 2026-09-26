@@ -2,41 +2,29 @@ package application.persistence;
 
 import application.user.User;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-
-@Entity
-@Table(
-        name = "service_users",
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_service_users_identity",
-                columnNames = {"bot_id", "user_id", "chat_id"}
-        )
-)
+/**
+ * Представляет строку пользователя, прочитанную из базы данных.
+ */
 public class UserEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "bot_id", nullable = false, length = 128)
-    private String botId;
-
-    @Column(name = "user_id", nullable = false, length = 128)
-    private String userId;
-
-    @Column(name = "chat_id", nullable = false, length = 128)
-    private String chatId;
-
-    @Column(name = "subscriptions_revision", nullable = false)
-    private long subscriptionsRevision;
+    private final long id;
+    private final String botId;
+    private final String userId;
+    private final String chatId;
+    private final long subscriptionsRevision;
 
 
-    protected UserEntity() {
+    public UserEntity(
+            long id,
+            String botId,
+            String userId,
+            String chatId,
+            long subscriptionsRevision
+    ) {
+        this.id = id;
+        this.botId = botId;
+        this.userId = userId;
+        this.chatId = chatId;
+        this.subscriptionsRevision = subscriptionsRevision;
     }
 
 
@@ -47,11 +35,6 @@ public class UserEntity {
 
     public long getSubscriptionsRevision() {
         return subscriptionsRevision;
-    }
-
-
-    public void advanceSubscriptionsRevision() {
-        subscriptionsRevision++;
     }
 
 

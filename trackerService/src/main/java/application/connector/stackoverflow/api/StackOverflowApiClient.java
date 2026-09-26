@@ -6,6 +6,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет HTTP-запросы к удалённому сервису для {@code StackOverflowApiClient}.
+ */
 @Component
 public class StackOverflowApiClient {
     private final HttpClient httpClient;

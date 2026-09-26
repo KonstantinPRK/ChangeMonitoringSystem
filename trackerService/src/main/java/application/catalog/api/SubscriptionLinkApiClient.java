@@ -13,6 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет HTTP-запросы к удалённому сервису для {@code SubscriptionLinkApiClient}.
+ */
 @Component
 public class SubscriptionLinkApiClient {
     private final HttpClient httpClient;
@@ -37,8 +40,11 @@ public class SubscriptionLinkApiClient {
     public CompletionStage<List<TrackedLink>> load(long afterId, int limit) {
         String trackerId = URLEncoder.encode(trackerProperties.id(), StandardCharsets.UTF_8);
         String path = "/api/v1/trackers/" + trackerId + "/links?afterId=" + afterId + "&limit=" + limit;
+
         HttpRequest request = requestBuilder.create(path).GET().build();
-        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+
+        return httpClient
+                .sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(responseReader::read);
     }
 }

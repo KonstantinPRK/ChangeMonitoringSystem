@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет прикладную операцию через {@code UntrackSubscriptionExecutor}.
+ */
 @Component
 public class UntrackSubscriptionExecutor implements SubscriptionOperationExecutor {
     private final SubscriptionServiceApiClient apiClient;

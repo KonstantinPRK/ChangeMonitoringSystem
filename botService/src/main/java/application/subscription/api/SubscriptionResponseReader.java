@@ -11,6 +11,9 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Читает и преобразует входные данные для {@code SubscriptionResponseReader}.
+ */
 @Component
 public class SubscriptionResponseReader {
     private final ObjectMapper objectMapper;

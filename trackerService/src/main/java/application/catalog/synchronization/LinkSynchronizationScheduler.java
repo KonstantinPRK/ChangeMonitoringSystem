@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Планирует периодический запуск задач через {@code LinkSynchronizationScheduler}.
+ */
 @Component
 public class LinkSynchronizationScheduler {
     private final LinkSynchronizationService synchronizationService;

@@ -12,6 +12,9 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Передаёт между компонентами данные {@code SubscriptionRequest}.
+ */
 public record SubscriptionRequest(
         @NotNull UUID requestId,
         @NotNull ActionType actionType,

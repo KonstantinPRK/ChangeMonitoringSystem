@@ -14,6 +14,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+/**
+ * Выполняет HTTP-запросы к удалённому сервису для {@code RemoteHttpClient}.
+ */
 @Component
 public class RemoteHttpClient {
     private final HttpClient client;

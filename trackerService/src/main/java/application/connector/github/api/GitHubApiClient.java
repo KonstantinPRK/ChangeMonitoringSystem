@@ -7,6 +7,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет HTTP-запросы к удалённому сервису для {@code GitHubApiClient}.
+ */
 @Component
 public class GitHubApiClient {
     private final HttpClient httpClient;

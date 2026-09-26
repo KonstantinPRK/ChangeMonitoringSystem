@@ -1,5 +1,8 @@
 package application.interaction;
 
+/**
+ * Определяет допустимые значения {@code ConversationState}.
+ */
 public enum ConversationState {
     WAITING_COMMAND,
     WAITING_TRACK_LINK,

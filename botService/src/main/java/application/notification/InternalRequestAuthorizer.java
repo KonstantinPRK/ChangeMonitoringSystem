@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+/**
+ * Проверяет право на выполнение внутреннего запроса через {@code InternalRequestAuthorizer}.
+ */
 @Component
 public class InternalRequestAuthorizer {
     private final BotProperties botProperties;

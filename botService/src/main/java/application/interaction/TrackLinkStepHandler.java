@@ -6,6 +6,9 @@ import application.user.BotUser;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Обрабатывает один сценарий через {@code TrackLinkStepHandler}.
+ */
 @Component
 public class TrackLinkStepHandler implements ConversationStepHandler {
     private final LinkParser linkParser;

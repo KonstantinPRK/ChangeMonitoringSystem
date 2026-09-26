@@ -14,6 +14,9 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.function.Function;
 
+/**
+ * Читает и преобразует входные данные для {@code GitHubObservationReader}.
+ */
 @Component
 public class GitHubObservationReader {
     private final ObjectMapper objectMapper;

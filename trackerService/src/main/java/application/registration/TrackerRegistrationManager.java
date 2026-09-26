@@ -7,6 +7,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Координирует совместную работу компонентов через {@code TrackerRegistrationManager}.
+ */
 @Component
 public class TrackerRegistrationManager {
     private final TrackerRegistrationApiClient apiClient;

@@ -8,6 +8,9 @@ import application.user.UserManager;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Обрабатывает один сценарий через {@code StartCommandHandler}.
+ */
 @Component
 public class StartCommandHandler implements CommandHandler {
     private final UserManager userManager;

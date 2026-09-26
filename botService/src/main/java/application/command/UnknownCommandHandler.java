@@ -6,6 +6,9 @@ import application.user.BotUser;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Обрабатывает один сценарий через {@code UnknownCommandHandler}.
+ */
 @Component
 public class UnknownCommandHandler implements CommandHandler {
     @Override

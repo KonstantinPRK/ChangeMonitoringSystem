@@ -12,6 +12,9 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Читает и преобразует входные данные для {@code TelegramUpdateParser}.
+ */
 @Component
 public class TelegramUpdateParser {
     private final TelegramProperties telegramProperties;

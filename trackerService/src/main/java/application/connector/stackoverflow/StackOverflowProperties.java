@@ -6,6 +6,9 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.Set;
 
+/**
+ * Передаёт между компонентами данные {@code StackOverflowProperties}.
+ */
 @ConfigurationProperties("app.stack-overflow")
 public record StackOverflowProperties(
         URI apiUrl,

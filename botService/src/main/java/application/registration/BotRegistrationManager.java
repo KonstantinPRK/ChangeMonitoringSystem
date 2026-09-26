@@ -15,6 +15,9 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Координирует совместную работу компонентов через {@code BotRegistrationManager}.
+ */
 @Component
 public class BotRegistrationManager {
     private final SubscriptionServiceApiClient apiClient;

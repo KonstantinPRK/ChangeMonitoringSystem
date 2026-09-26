@@ -9,6 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Передаёт между компонентами данные {@code BotNotification}.
+ */
 public record BotNotification(
         @NotNull UUID notificationId,
         @NotNull UUID eventId,

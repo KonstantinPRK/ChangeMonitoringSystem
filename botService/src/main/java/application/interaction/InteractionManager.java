@@ -6,6 +6,9 @@ import application.user.UserManager;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Координирует совместную работу компонентов через {@code InteractionManager}.
+ */
 @Component
 public class InteractionManager {
     private final UserManager userManager;

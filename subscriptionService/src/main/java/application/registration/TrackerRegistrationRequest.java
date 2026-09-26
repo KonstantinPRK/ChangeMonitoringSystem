@@ -7,6 +7,9 @@ import jakarta.validation.constraints.Size;
 import java.net.URI;
 import java.util.Set;
 
+/**
+ * Передаёт между компонентами данные {@code TrackerRegistrationRequest}.
+ */
 public record TrackerRegistrationRequest(
         @NotBlank @Size(max = 128) String trackerId,
         @NotNull URI baseUrl,

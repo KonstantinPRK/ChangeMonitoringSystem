@@ -81,7 +81,7 @@
   ],
   "refresh": "10s",
   "schemaVersion": 41,
-  "tags": ["ChangeMonitoringSystem", "bot"],
+  "tags": ["ChangeMonitoringSystem", "bot-service"],
   "templating": {
     "list": [
       {

@@ -2,6 +2,9 @@ package application.subscription.operation;
 
 import java.time.Duration;
 
+/**
+ * Передаёт между компонентами данные {@code OperationExecution}.
+ */
 public record OperationExecution(boolean completed, Duration retryAfter, String reason) {
     public static OperationExecution success() {
         return new OperationExecution(true, Duration.ZERO, "");

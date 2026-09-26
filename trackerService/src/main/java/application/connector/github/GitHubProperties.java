@@ -6,6 +6,9 @@ import java.net.URI;
 import java.time.Duration;
 import java.util.Set;
 
+/**
+ * Передаёт между компонентами данные {@code GitHubProperties}.
+ */
 @ConfigurationProperties("app.github")
 public record GitHubProperties(
         URI apiUrl,

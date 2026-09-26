@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Передаёт данные между независимыми частями приложения через {@code MessengerDataBridge}.
+ */
 @Component
 public class MessengerDataBridge {
     private final MessengerClientRegistry clientRegistry;

@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Выполняет прикладную операцию через {@code StopSubscriptionsExecutor}.
+ */
 @Component
 public class StopSubscriptionsExecutor implements SubscriptionOperationExecutor {
     private final RemoveAllSubscriptions removeAllSubscriptions;

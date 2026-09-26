@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.net.http.HttpRequest;
 
+/**
+ * Формирует запросы внешнего протокола для {@code GitHubRequestFactory}.
+ */
 @Component
 public class GitHubRequestFactory {
     private final GitHubProperties gitHubProperties;

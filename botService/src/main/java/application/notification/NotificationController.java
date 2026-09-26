@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Предоставляет HTTP-эндпоинты компонента {@code NotificationController}.
+ */
 @RestController
 @RequestMapping("/api/v1/notifications")
 @ConditionalOnProperty(name = "app.message-transport", havingValue = "HTTP", matchIfMissing = true)
